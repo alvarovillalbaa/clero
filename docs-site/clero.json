@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "clero.config.v1",
+  "name": "Clero",
+  "description": "Documentation, clear by design.",
+  "accent": "#3556d8",
+  "pages": [
+    { "slug": "introduction", "title": "Introduction", "description": "Give good ideas a clear place to live.", "group": "Get started", "file": "pages/introduction.md" },
+    { "slug": "quickstart", "title": "Quickstart", "description": "From a Markdown file to your own documentation site.", "group": "Get started", "file": "pages/quickstart.md" },
+    { "slug": "writing", "title": "Writing pages", "description": "A small, useful Markdown vocabulary.", "group": "Author your docs", "file": "pages/writing.md" },
+    { "slug": "workspace", "title": "Your workspace", "description": "Edit, keep and export your documentation on this device.", "group": "Author your docs", "file": "pages/workspace.md" },
+    { "slug": "configuration", "title": "Project reference", "description": "The files that make a Clero project.", "group": "Reference", "file": "pages/configuration.md" },
+    { "slug": "publishing", "title": "Publishing", "description": "A portable site, hosted wherever you choose.", "group": "Reference", "file": "pages/publishing.md" },
+    { "slug": "limits", "title": "Scope and limits", "description": "Understand what the publisher currently provides.", "group": "Reference", "file": "pages/limits.md" }
+  ]
+}

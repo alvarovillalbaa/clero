@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Clero — a quiet place for your documentation. Read, write and export a Markdown workspace on your device.">
+  <meta name="color-scheme" content="light dark">
+  <title>Clero · Documentation</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="masthead">
+    <a id="home-link" class="brand" href="?page=introduction" aria-label="Documentation home"><span class="brand-mark" aria-hidden="true">c.</span><span id="project-name">Clero</span></a>
+    <div class="masthead-actions">
+      <button id="nav-toggle" class="quiet-button mobile-only" type="button" aria-expanded="false" aria-controls="reader-navigation">Contents</button>
+      <button id="open-search" class="search-trigger" type="button" aria-haspopup="dialog"><span>Search docs</span><kbd aria-hidden="true">⌘ K</kbd></button>
+      <button id="theme-toggle" class="quiet-button theme-button" type="button" aria-label="Use dark theme"><span aria-hidden="true">◐</span></button>
+      <button id="workspace-toggle" class="workspace-toggle" type="button" aria-expanded="false" aria-controls="workspace-view">Workspace <span aria-hidden="true">↗</span></button>
+    </div>
+  </header>
+
+  <div id="global-status" class="global-status" role="status" aria-live="polite" hidden></div>
+  <div id="device-banner" class="device-banner" hidden><span id="device-banner-text"></span><button id="device-workspace" type="button" class="text-button">Open workspace</button></div>
+
+  <div id="reader-view" class="reader-layout">
+    <aside id="reader-navigation" class="navigation" aria-label="Documentation navigation">
+      <div class="rail-caption">THE FIELD GUIDE</div>
+      <p id="project-description" class="project-description">Clear words. A little room to think.</p>
+      <nav id="page-nav" aria-label="Pages"><p class="subtle">Loading documentation…</p></nav>
+      <div class="rail-colophon"><span>Written in Markdown.</span><span>Published with <a href="https://github.com/alvarovillalbaa/clero" target="_blank" rel="noopener noreferrer">Clero</a>.</span></div>
+    </aside>
+    <main id="main" class="reading-room" tabindex="-1">
+      <article id="document" aria-labelledby="page-title">
+        <header class="document-header"><p id="page-group" class="eyebrow">DOCUMENTATION</p><h1 id="page-title">A place for the details.</h1><p id="page-description" class="document-description">Opening the published project…</p></header>
+        <div id="document-content" class="prose" aria-busy="true"><p>Loading the actual project file.</p></div>
+        <div id="render-warnings" class="render-warnings" hidden></div>
+      </article>
+      <nav id="page-neighbours" class="page-neighbours" aria-label="Previous and next pages"></nav>
+      <footer class="reading-footer"><span class="tiny-mark" aria-hidden="true">c.</span><span>Good documentation leaves room for the reader.</span></footer>
+    </main>
+    <aside class="contents-rail" aria-labelledby="contents-title"><h2 id="contents-title">On this page</h2><nav id="heading-nav" aria-label="On this page"></nav></aside>
+  </div>
+
+  <section id="workspace-view" class="workspace" aria-labelledby="workspace-title" hidden>
+    <header class="workspace-header"><div><p class="eyebrow">THE WORKING COPY</p><h1 id="workspace-title" tabindex="-1">Make yourself clear.</h1><p id="workspace-source" class="subtle">Import a project to begin. Your file stays on this device.</p></div><button id="close-workspace" class="quiet-button" type="button">Back to reading <span aria-hidden="true">↗</span></button></header>
+    <div class="workspace-toolbar">
+      <label class="button file-button">Import project JSON<input id="project-file" type="file" accept=".json,application/json"><span class="sr-only">Choose a local project JSON file, at most 5 MiB</span></label>
+      <button id="export-project" class="button" type="button" disabled>Export workspace JSON</button>
+      <button id="save-device" class="button primary" type="button" disabled>Save on this device</button>
+      <button id="discard-workspace" class="text-button" type="button" disabled>Discard local workspace</button>
+    </div>
+    <p class="workspace-explanation">An export contains the original Markdown. To publish a website, pass the exported JSON file or a Markdown source directory to the Clero CLI. This workspace does not deploy or upload your project.</p>
+    <div id="workspace-status" class="workspace-status" role="status" aria-live="polite"></div>
+    <div id="workspace-error" class="workspace-error" role="alert" tabindex="-1" hidden></div>
+    <div id="workspace-columns" class="workspace-columns" hidden>
+      <aside class="workspace-pages" aria-labelledby="workspace-pages-title"><div class="workspace-page-heading"><h2 id="workspace-pages-title">Pages</h2><button id="add-page" class="quiet-button" type="button" aria-label="Add a page">+</button></div><nav id="workspace-page-nav" aria-label="Workspace pages"></nav></aside>
+      <div class="workspace-editor">
+        <form id="editor-form">
+          <details class="project-settings"><summary>Project settings</summary><div class="field-grid"><label>Project name<input id="edit-project-name" name="project-name" required maxlength="128" autocomplete="off"></label><label>Accent colour<input id="edit-accent" name="accent" type="color" value="#3556d8"></label><label class="full-field">Project description<input id="edit-project-description" name="project-description" maxlength="512" autocomplete="off"></label></div></details>
+          <div class="editor-heading"><span class="eyebrow">PAGE SOURCE</span><button id="delete-page" class="text-button danger" type="button">Delete page</button></div>
+          <div class="field-grid"><label>Title<input id="edit-title" name="title" required maxlength="160" autocomplete="off"></label><label>Page URL slug<input id="edit-slug" name="slug" required autocomplete="off" aria-describedby="slug-help"></label><label>Navigation group<input id="edit-group" name="group" required maxlength="80" autocomplete="off"></label><label>Description<input id="edit-description" name="description" maxlength="512" autocomplete="off"></label></div>
+          <p id="slug-help" class="field-help">Lowercase words separated by hyphens; use / for nested pages. Changing a slug changes its direct URL.</p>
+          <label class="markdown-label" for="edit-content">Markdown</label><textarea id="edit-content" name="content" class="markdown-editor" spellcheck="false" rows="22" aria-describedby="markdown-help"></textarea>
+          <p id="markdown-help" class="field-help">Markdown is rendered as documentation. Raw HTML, scripts and MDX are displayed as text, never executed.</p>
+          <div class="editor-actions"><button id="apply-preview" class="button primary" type="submit">Apply to preview</button><button id="reset-page" class="quiet-button" type="button">Discard unapplied edits</button><span id="edit-state" class="field-help">No unapplied edits.</span></div>
+        </form>
+        <section class="workspace-preview" aria-labelledby="preview-title"><div class="preview-heading"><span class="eyebrow">APPLIED PREVIEW</span><span class="subtle">Your last valid working copy</span></div><h2 id="preview-title"></h2><p id="preview-description" class="subtle"></p><div id="editor-preview" class="prose"></div><div id="preview-warnings" class="render-warnings" hidden></div></section>
+      </div>
+    </div>
+    <details class="publish-note"><summary>From workspace to a published website</summary><p>Export this workspace JSON, then pass that actual file to the Clero CLI from its repository:</p><pre><code>node bin/clero.mjs check ./clero-workspace.json
+node bin/clero.mjs build ./clero-workspace.json --out ./my-docs-site</code></pre><p>Replace the example filename with your downloaded JSON filename. The build creates a new static output directory and refuses an existing destination. It does not upload automatically; choose explicitly where to host the resulting website.</p><p>Prefer Markdown files? <code>node bin/clero.mjs init ./my-docs</code> creates a source directory with <code>clero.json</code>. The same check and build commands accept that directory.</p></details>
+  </section>
+
+  <dialog id="search-dialog" class="search-dialog" aria-labelledby="search-title">
+    <div class="search-dialog-heading"><h2 id="search-title">Find a thought.</h2><button id="close-search" class="quiet-button" type="button" aria-label="Close search">Esc</button></div>
+    <label class="sr-only" for="search-input">Search page titles and content</label><input id="search-input" type="search" maxlength="256" placeholder="Search page titles and content…" autocomplete="off" spellcheck="false">
+    <p id="search-status" class="search-status" role="status" aria-live="polite">Type to search this project.</p><ul id="search-results" class="search-results"></ul>
+    <p class="search-footnote">Search stays in this browser. Use Tab to choose a result.</p>
+  </dialog>
+  <noscript><p class="global-status">Clero's interactive reader requires JavaScript. Your original Markdown files and exported JSON remain portable.</p></noscript>
+</body>
+</html>
