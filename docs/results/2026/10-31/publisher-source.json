@@ -1,0 +1,438 @@
+{
+  "schemaVersion": "clero.publisher-check-source.v1",
+  "repository": "alvarovillalbaa/clero",
+  "initialRuntimeCommit": "d62e34e230797ef3acc00f418889d610ffb778b2",
+  "scope": "48 authored model, Markdown and actual CLI/filesystem cases; unrun",
+  "runtime": {
+    "node": "24.21.0",
+    "runner": "ubuntu-24.04",
+    "jobMinutes": 5,
+    "testWallClockSeconds": 120,
+    "dependenciesInstalled": false
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "gitSha": "62c31d3bd79bb84bcfa239802de9c651c52b6fa9"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "gitSha": "6c441daba0ebea43e0e5214676b9aa86cd653e5b"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "gitSha": "7694388483b2d169819b727c2484e0e748498f4c"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "gitSha": "93cb3fb5bd9c06d9de0fdf5a67d8f3cc69c986a5"
+    },
+    {
+      "path": "bin/clero.mjs",
+      "mode": "100755",
+      "gitSha": "901cfd878a5f87977c4a396ff2f6dbddf0f448c7"
+    },
+    {
+      "path": "docs-site/clero.json",
+      "mode": "100644",
+      "gitSha": "e9d29aa838f49bb2bca954a67c686a2b9fe92179"
+    },
+    {
+      "path": "docs-site/pages/configuration.md",
+      "mode": "100644",
+      "gitSha": "57c1dc63bd8614a51b4d132ac2e483e5fc018461"
+    },
+    {
+      "path": "docs-site/pages/introduction.md",
+      "mode": "100644",
+      "gitSha": "ef89dbf4fb5a539c1fd4682ecb1f07e83e169d52"
+    },
+    {
+      "path": "docs-site/pages/limits.md",
+      "mode": "100644",
+      "gitSha": "7d4c44f9a0f242a42bbb3c1bee3ee9f9ec424785"
+    },
+    {
+      "path": "docs-site/pages/publishing.md",
+      "mode": "100644",
+      "gitSha": "81029dddc9ad19fe9f0842671dc378961a20a418"
+    },
+    {
+      "path": "docs-site/pages/quickstart.md",
+      "mode": "100644",
+      "gitSha": "9b9e7e5b3c275feb6bf74e9e9a37e5110fa4a207"
+    },
+    {
+      "path": "docs-site/pages/workspace.md",
+      "mode": "100644",
+      "gitSha": "5a86608664264ac50ab06ca88dceecd30c7a40e0"
+    },
+    {
+      "path": "docs-site/pages/writing.md",
+      "mode": "100644",
+      "gitSha": "8aa9bd9f31f03370d5824cfca1a3e1cbfb8cfe2c"
+    },
+    {
+      "path": "docs/architecture.md",
+      "mode": "100644",
+      "gitSha": "dbca8484482d79a4bc45590c171930a9f7d4246f"
+    },
+    {
+      "path": "docs/proposals/publisher-checks.md",
+      "mode": "100644",
+      "gitSha": "b7862aeead92d7a1a97d47c1f1092fcf6e6d40ca"
+    },
+    {
+      "path": "docs/proposals/publisher-checks.workflow.yml.example",
+      "mode": "100644",
+      "gitSha": "d5688a947d69231e21f3e18e8b6624e9b4797816"
+    },
+    {
+      "path": "docs/spec.md",
+      "mode": "100644",
+      "gitSha": "7ba371983495538125cafaeb268b615cfceb3f70"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "gitSha": "a8380e408b6062edb9e828cb183ea0b36c23ccae"
+    },
+    {
+      "path": "tests/cli.test.mjs",
+      "mode": "100644",
+      "gitSha": "d811a1b24eb198c21081cdb93e54fec479334784"
+    },
+    {
+      "path": "tests/markdown.test.mjs",
+      "mode": "100644",
+      "gitSha": "7211459036dcb6d27539197381870dcdf69b88a7"
+    },
+    {
+      "path": "tests/model.test.mjs",
+      "mode": "100644",
+      "gitSha": "91f9a9bd5f8f74bbb85e814da72ac086d773e651"
+    },
+    {
+      "path": "vercel.json",
+      "mode": "100644",
+      "gitSha": "6138fec3e7fcc23635311aa6f58866a56b207ea3"
+    },
+    {
+      "path": "web/app.mjs",
+      "mode": "100644",
+      "gitSha": "957fd6bd6dc3be4f7927e55d28e1bb92b4403706"
+    },
+    {
+      "path": "web/favicon.svg",
+      "mode": "100644",
+      "gitSha": "928162d74330452cc53c81abca648a0e7f077c32"
+    },
+    {
+      "path": "web/index.html",
+      "mode": "100644",
+      "gitSha": "93d011f7f4ced7e7573d80f93b4fb5a15d34837c"
+    },
+    {
+      "path": "web/lib/markdown.mjs",
+      "mode": "100644",
+      "gitSha": "d28c7709bbb04b561b2aa3e5a490033239de7f9d"
+    },
+    {
+      "path": "web/lib/model.mjs",
+      "mode": "100644",
+      "gitSha": "25c2b1acd87f722ee227231203f25201a741a011"
+    },
+    {
+      "path": "web/styles.css",
+      "mode": "100644",
+      "gitSha": "205977de7b9bd7f66f709974b878da9333a4b90a"
+    }
+  ],
+  "selectedInputs": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "gitSha": "62c31d3bd79bb84bcfa239802de9c651c52b6fa9",
+      "sha256": "a3425ab95194d39238cd6396a01250d1efa980d1a47b8792b837171c180c2b7b",
+      "bytes": 59
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "gitSha": "6c441daba0ebea43e0e5214676b9aa86cd653e5b",
+      "sha256": "84e885c3da037e99d188f2041ef72b09a6acee58911aacc3537afff30a545256",
+      "bytes": 1452
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "gitSha": "7694388483b2d169819b727c2484e0e748498f4c",
+      "sha256": "6e3ae862a0f98e9f377f98f71fd86160932dad7186416f5509a335703c6fe3b5",
+      "bytes": 1078
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "gitSha": "93cb3fb5bd9c06d9de0fdf5a67d8f3cc69c986a5",
+      "sha256": "ae9ca97ab3334bfa2ef7d82102a54831b5d142eb110016ebdf7b03638ecfb15d",
+      "bytes": 1844
+    },
+    {
+      "path": "bin/clero.mjs",
+      "mode": "100755",
+      "gitSha": "901cfd878a5f87977c4a396ff2f6dbddf0f448c7",
+      "sha256": "76081a2644d9cbc74318fc8c1acc732e6388ec09e194a3e73d744248883b9934",
+      "bytes": 11934
+    },
+    {
+      "path": "docs-site/clero.json",
+      "mode": "100644",
+      "gitSha": "e9d29aa838f49bb2bca954a67c686a2b9fe92179",
+      "sha256": "e29ddb8f96f18aeebbe7654e74b885ed5566194a05da539f4c0cb1703464a9eb",
+      "bytes": 1372
+    },
+    {
+      "path": "docs-site/pages/configuration.md",
+      "mode": "100644",
+      "gitSha": "57c1dc63bd8614a51b4d132ac2e483e5fc018461",
+      "sha256": "13cae811ecbcf7ca4b089b39fb5da02849d3baeea1659c4c27dc7dc208352170",
+      "bytes": 1607
+    },
+    {
+      "path": "docs-site/pages/introduction.md",
+      "mode": "100644",
+      "gitSha": "ef89dbf4fb5a539c1fd4682ecb1f07e83e169d52",
+      "sha256": "c513f3627e0bd3792474466f110bf0881268f35ea23b89bd1ecf296867f18a00",
+      "bytes": 1171
+    },
+    {
+      "path": "docs-site/pages/limits.md",
+      "mode": "100644",
+      "gitSha": "7d4c44f9a0f242a42bbb3c1bee3ee9f9ec424785",
+      "sha256": "2c7334c4d7d40e894e6700e06a03fba06091d86eb4d9f1c1f4c0b0711502de8f",
+      "bytes": 1202
+    },
+    {
+      "path": "docs-site/pages/publishing.md",
+      "mode": "100644",
+      "gitSha": "81029dddc9ad19fe9f0842671dc378961a20a418",
+      "sha256": "4c712b5a12c824e9e8a9816bcde8057cdfa228223c088047cc3c8396f488f3ed",
+      "bytes": 1533
+    },
+    {
+      "path": "docs-site/pages/quickstart.md",
+      "mode": "100644",
+      "gitSha": "9b9e7e5b3c275feb6bf74e9e9a37e5110fa4a207",
+      "sha256": "710b653dde2a7c661036d4742ddacf3d3ae6e3d6f96d29f3fd2aca837bbde1fe",
+      "bytes": 1239
+    },
+    {
+      "path": "docs-site/pages/workspace.md",
+      "mode": "100644",
+      "gitSha": "5a86608664264ac50ab06ca88dceecd30c7a40e0",
+      "sha256": "b4cb0b03992fde768617bae95d46956baf02b7d12b27277c1c6b77f2a512ea60",
+      "bytes": 1449
+    },
+    {
+      "path": "docs-site/pages/writing.md",
+      "mode": "100644",
+      "gitSha": "8aa9bd9f31f03370d5824cfca1a3e1cbfb8cfe2c",
+      "sha256": "f78f6f9f792a59587c57e66880475d538b35adf4657b4b602ca4cd66cb31cc4e",
+      "bytes": 1731
+    },
+    {
+      "path": "docs/architecture.md",
+      "mode": "100644",
+      "gitSha": "dbca8484482d79a4bc45590c171930a9f7d4246f",
+      "sha256": "f5ffc0ae9be904b10516f3bfc20a380be4ee5e3a352f11880a297c1908a1cb95",
+      "bytes": 2876
+    },
+    {
+      "path": "docs/proposals/publisher-checks.md",
+      "mode": "100644",
+      "gitSha": "b7862aeead92d7a1a97d47c1f1092fcf6e6d40ca",
+      "sha256": "0b83e0a71e2279ccac36f7cb1355d333fe09a3fc017b78a47755f62f93cbd86f",
+      "bytes": 4895
+    },
+    {
+      "path": "docs/proposals/publisher-checks.workflow.yml.example",
+      "mode": "100644",
+      "gitSha": "d5688a947d69231e21f3e18e8b6624e9b4797816",
+      "sha256": "7aedf50c0ea0179519e340e030d7425a99be1337bb835e42dab31c418fe2a9cc",
+      "bytes": 9940
+    },
+    {
+      "path": "docs/spec.md",
+      "mode": "100644",
+      "gitSha": "7ba371983495538125cafaeb268b615cfceb3f70",
+      "sha256": "c3d5a9e53025d09178fe520e0eeea8f9d47cfb9d697f9208009ae357c0ec0d51",
+      "bytes": 3489
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "gitSha": "a8380e408b6062edb9e828cb183ea0b36c23ccae",
+      "sha256": "0c81f4a7aa20b1f4a063528a9e36199d5e4105286fff7dcda2be8ef0ff453f18",
+      "bytes": 299
+    },
+    {
+      "path": "tests/cli.test.mjs",
+      "mode": "100644",
+      "gitSha": "d811a1b24eb198c21081cdb93e54fec479334784",
+      "sha256": "5dc201679274be0eb80f62000e4169ebc0e4b20ad7480f05d8493a45075827b6",
+      "bytes": 15838
+    },
+    {
+      "path": "tests/markdown.test.mjs",
+      "mode": "100644",
+      "gitSha": "7211459036dcb6d27539197381870dcdf69b88a7",
+      "sha256": "53773460d5eda1b6e6c9f8b8a39edd48a8b6fc9c2bd2f0965a526d5322cfba98",
+      "bytes": 10607
+    },
+    {
+      "path": "tests/model.test.mjs",
+      "mode": "100644",
+      "gitSha": "91f9a9bd5f8f74bbb85e814da72ac086d773e651",
+      "sha256": "0981b841d367f5a3ea1807f257eda2b70c6ca60219aab199af69a5e0d8f5d541",
+      "bytes": 9579
+    },
+    {
+      "path": "vercel.json",
+      "mode": "100644",
+      "gitSha": "6138fec3e7fcc23635311aa6f58866a56b207ea3",
+      "sha256": "83e157a7c37c2cd575f852110613f0e728ca1ebbf2dfa54ff7ca41dd68911bb5",
+      "bytes": 182
+    },
+    {
+      "path": "web/app.mjs",
+      "mode": "100644",
+      "gitSha": "957fd6bd6dc3be4f7927e55d28e1bb92b4403706",
+      "sha256": "9ed0c54e12d7d88f2950ca17d2034ee25e2bc104366315ea652a0301a409abec",
+      "bytes": 29920
+    },
+    {
+      "path": "web/favicon.svg",
+      "mode": "100644",
+      "gitSha": "928162d74330452cc53c81abca648a0e7f077c32",
+      "sha256": "52aca6910b92917172644ccfb16134eb4666e04305a198d99049c3caa617d543",
+      "bytes": 231
+    },
+    {
+      "path": "web/index.html",
+      "mode": "100644",
+      "gitSha": "93d011f7f4ced7e7573d80f93b4fb5a15d34837c",
+      "sha256": "bcdc36eb87a888449c524f0a8548743a514de2069e959685e006125fcdc82773",
+      "bytes": 9527
+    },
+    {
+      "path": "web/lib/markdown.mjs",
+      "mode": "100644",
+      "gitSha": "d28c7709bbb04b561b2aa3e5a490033239de7f9d",
+      "sha256": "9d4fe505c6c5548124f5cb0677baadaeb3723ebf0c76c85b1d420642bb50fb23",
+      "bytes": 12117
+    },
+    {
+      "path": "web/lib/model.mjs",
+      "mode": "100644",
+      "gitSha": "25c2b1acd87f722ee227231203f25201a741a011",
+      "sha256": "eea5385bc12479dbc445f758ba8a01e61e67a5a15d21f49e6d8dc62b933bc95b",
+      "bytes": 4819
+    },
+    {
+      "path": "web/styles.css",
+      "mode": "100644",
+      "gitSha": "205977de7b9bd7f66f709974b878da9333a4b90a",
+      "sha256": "79ed729a6419c34b4619ce29ad98997fd7d3d148665ab0241f23c3ee68bf9488",
+      "bytes": 19300
+    }
+  ],
+  "testFiles": [
+    {
+      "path": "tests/cli.test.mjs",
+      "names": [
+        "T2 CLI init creates a real Markdown project and declared files",
+        "T2 CLI check validates a Markdown directory without changing it",
+        "T2 CLI build emits actual assets, exact sources and a verified hash manifest",
+        "T2 CLI build accepts an exported project bundle and preserves source bytes",
+        "T2 CLI init refuses an existing destination and preserves its tree",
+        "T2 CLI build refuses an existing destination and preserves input and output",
+        "T2 CLI refuses symlink project directory and bundle inputs before output",
+        "T2 CLI refuses nested declared-page traversal before output and preserves its owned sibling",
+        "T2 CLI refuses symlinked Markdown files and nested Markdown directories",
+        "T2 CLI rejects duplicate declared files and duplicate page slugs before output",
+        "T2 CLI refuses malformed UTF-8 in Markdown and exported bundles",
+        "T2 CLI refuses individual-page and aggregate Markdown byte-budget overflow",
+        "T2 CLI rejects missing pages, same-page and cross-page headings, and dangerous links before output",
+        "T2 CLI argument errors have a failing exit status and perform no writes"
+      ]
+    },
+    {
+      "path": "tests/markdown.test.mjs",
+      "names": [
+        "HTML escaping protects text and both attribute quote styles",
+        "headings expose deterministic namespaced unique Unicode anchors and plain labels",
+        "paragraphs blockquotes and horizontal rules render a closed block vocabulary",
+        "ordered and unordered lists preserve item order with escaped item text",
+        "fenced code escapes source and language while assigning copy controls to code blocks",
+        "inline code strong emphasis and escaped punctuation retain searchable text",
+        "external HTTP HTTPS and mailto links use validated URLs and safe attributes",
+        "relative known Markdown pages and local fragments resolve from the current directory",
+        "missing internal pages remain escaped labels with an actionable warning",
+        "dangerous malformed and escaping link destinations never become anchors",
+        "raw HTML MDX scripts and event-bearing tags remain source text",
+        "image syntax produces only its label and never loads local or remote resources",
+        "simple tables escape cells preserve reading order and warn on uneven rows",
+        "renderer metadata and collections are detached frozen values",
+        "renderer limits warnings and rejects invalid Unicode oversized content and accessor options",
+        "unclosed code and malformed inline syntax remain deterministic escaped data",
+        "resolved link metadata binds page fragments without retaining source destinations",
+        "heading allocation is bounded and never collides with reader DOM identities"
+      ]
+    },
+    {
+      "path": "tests/model.test.mjs",
+      "names": [
+        "project normalization supplies exact defaults and detaches frozen data",
+        "project normalization accepts data-only null-prototype records and preserves page order",
+        "project normalization rejects non-record roots and unsupported or missing schemas",
+        "project normalization rejects extra hidden symbol and accessor root fields without reading getters",
+        "project pages reject inherited unknown hidden symbol and accessor fields",
+        "project page arrays must be dense bounded data without getters or extra fields",
+        "project names and titles enforce nonblank single-line character boundaries",
+        "project descriptions and groups retain defaults but reject invalid explicit values",
+        "project accents accept only six hexadecimal digits and normalize case",
+        "slugs retain lowercase nested identities and page hrefs encode their path as query data",
+        "slugs reject traversal reserved runtime paths ambiguous encodings and excessive depth",
+        "projects reject duplicate slug identities and absent required page fields",
+        "projects preserve valid Unicode but reject NUL and isolated surrogate code units",
+        "project page limits count UTF-8 bytes and accept the inclusive byte boundary",
+        "project aggregate content has an inclusive four MiB byte budget",
+        "canonical pretty JSON stays within the five MiB browser import budget after escaping"
+      ]
+    }
+  ],
+  "totals": {
+    "model": 16,
+    "markdown": 18,
+    "cli": 14,
+    "total": 48
+  },
+  "staticChecks": {
+    "javascriptModules": 7,
+    "relativeImports": 7,
+    "htmlUniqueIds": 63,
+    "htmlScriptTargets": 55,
+    "htmlLocalAssets": 3,
+    "typescriptParser": "5.9.3",
+    "testsExecuted": 0
+  },
+  "limits": [
+    "No local build under the failed Storage Guard preflight",
+    "No browser, server, database, production data, provider/model call or package installation",
+    "Source/build evidence does not prove behavioral acceptance or full product completion"
+  ]
+}
