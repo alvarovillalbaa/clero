@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "clero.initial-publication.v1",
+  "date": "2026-10-31",
+  "timezone": "Europe/Rome",
+  "repository": "alvarovillalbaa/clero",
+  "runtimeCommit": "d62e34e230797ef3acc00f418889d610ffb778b2",
+  "sourceCommit": "79813554c1449d6c48775fbd3d65626a45634f7b",
+  "repositoryCreation": {
+    "method": "Authenticated GitHub CLI; connector does not expose repository creation",
+    "ownerVerified": "alvarovillalbaa",
+    "visibility": "public",
+    "credentialsPrinted": false
+  },
+  "git": {
+    "localLeaves": 30,
+    "remoteLeaves": 30,
+    "mismatches": 0,
+    "allSourceInputs": 28,
+    "activeWorkflows": 0
+  },
+  "project": {
+    "id": "prj_oHO4B9wP4KmzCpJVKhfNlZPsMStd",
+    "name": "clero-alvaro",
+    "team": "Clous Team",
+    "existingPlan": "pro",
+    "gitLink": {
+      "provider": "github",
+      "owner": "alvarovillalbaa",
+      "repo": "clero"
+    }
+  },
+  "provisioningRecovery": {
+    "initialHelper": "Unexpected-schema response after successful project creation",
+    "readback": "Project and Git link verified; zero deployments existed",
+    "action": "No duplicate project write; subsequent source push triggered the linked production deployment"
+  },
+  "deployment": {
+    "id": "dpl_Ffte1qcKMKAe8BvpNSfT2PLy76XV",
+    "state": "READY",
+    "url": "clero-alvaro-g1ymhj4u5-my-team-4f230354.vercel.app",
+    "target": "production",
+    "aliases": [
+      "clero-alvaro.vercel.app",
+      "clero-alvaro-my-team-4f230354.vercel.app",
+      "clero-alvaro-git-main-my-team-4f230354.vercel.app"
+    ],
+    "sourceCommit": "79813554c1449d6c48775fbd3d65626a45634f7b",
+    "githubRepo": "clero",
+    "nodeVersion": null,
+    "errorCode": null
+  },
+  "build": {
+    "schemaVersion": "clero.project.v1",
+    "name": "Clero",
+    "pages": 7,
+    "headings": 29,
+    "contentBytes": 9932,
+    "files": 15,
+    "nodeVersion": "v26.13.0",
+    "dependenciesInstalled": false,
+    "localBuild": false
+  },
+  "publicHttp": {
+    "verified": false,
+    "attempts": [
+      {
+        "url": "https://clero-alvaro.vercel.app/",
+        "httpStatus": null,
+        "transportExit": 6,
+        "error": "Local DNS resolution failed"
+      },
+      {
+        "url": "https://clero-alvaro.vercel.app/app.mjs",
+        "httpStatus": null,
+        "transportExit": 6,
+        "error": "Local DNS resolution failed"
+      },
+      {
+        "url": "https://clero-alvaro.vercel.app/project.json",
+        "httpStatus": null,
+        "transportExit": 6,
+        "error": "Local DNS resolution failed"
+      }
+    ],
+    "webFetch": "Public URL fetch tool also reported inaccessible",
+    "protectionBypassOrShareLinksCreated": false
+  },
+  "static": {
+    "javascriptSyntaxModules": 7,
+    "relativeImportsResolved": 7,
+    "htmlUniqueIds": 63,
+    "htmlJsTargets": 55,
+    "htmlLocalAssets": 3,
+    "workflowYamlJobs": 1,
+    "workflowBashSyntax": 2,
+    "workflowEmbeddedNodeSyntax": 1,
+    "stagedWhitespaceErrors": 0,
+    "completeSourceInputs": 28
+  },
+  "checks": {
+    "model": 16,
+    "markdown": 18,
+    "cli": 14,
+    "total": 48,
+    "executed": 0,
+    "sourceHeadActions": 0,
+    "activeWorkflows": 0,
+    "status": "Exact-source approval question sent once; delivery is not approval",
+    "proposal": "docs/proposals/publisher-checks.md",
+    "proposalGitSha": "b7862aeead92d7a1a97d47c1f1092fcf6e6d40ca",
+    "jobMinutes": 5,
+    "testSeconds": 120
+  },
+  "storage": {
+    "freeGiB": 18.6,
+    "requiredGiB": 34,
+    "localBuildOrInstallStarted": false
+  },
+  "unchangedOtherProjects": [
+    "la-porra",
+    "dearweek",
+    "known-world",
+    "agent-library"
+  ],
+  "limits": [
+    "Anonymous HTTP access not verified due transport failures",
+    "No interactive browser, clipboard, download, keyboard, storage-quota or mobile acceptance",
+    "No npm release, database/Auth, Git sync, hosted collaboration, provider/model call or new paid enrollment",
+    "Initial publisher does not establish full Mintlify feature parity or completion of the overall portfolio"
+  ]
+}
