@@ -62,7 +62,7 @@ Agent Library remain excluded from routine follow-through.
 ## Publication and remaining evidence
 
 Source publication and exact hosted build readback are recorded in the
-separate static-publication deployment receipt after this commit. No public
+separate [deployment receipt](static-publication-delivery.md). No public
 HTTP, JavaScript-disabled rendered interaction, browser history, clipboard,
 device-storage or crawler-indexing result is claimed here. Configured accent
 colour is applied by the interactive reader; static HTML uses the stylesheet's

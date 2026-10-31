@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "clero.static-publication-delivery.v1",
+  "recordedAt": "2026-10-31T00:14:04Z",
+  "repository": "https://github.com/alvarovillalbaa/clero",
+  "sourceCommit": "6f28d775053359d332c17104d5df6a508cd365b5",
+  "sourceTree": {
+    "commit": "6f28d775053359d332c17104d5df6a508cd365b5",
+    "tree": "2508f601ef124f7f9afe9729ac12ed852c7a5935",
+    "leaves": 40,
+    "allPathsModesTypesBlobsEqual": true
+  },
+  "sourceInputs": 34,
+  "deployment": {
+    "id": "dpl_U53AavvjnzhiKHVhCQixz24pER1Q",
+    "state": "READY",
+    "target": "production",
+    "url": "clero-alvaro-fh53uk7eb-my-team-4f230354.vercel.app",
+    "alias": [
+      "clero-alvaro.vercel.app",
+      "clero-alvaro-my-team-4f230354.vercel.app",
+      "clero-alvaro-git-main-my-team-4f230354.vercel.app"
+    ],
+    "source": "6f28d775053359d332c17104d5df6a508cd365b5"
+  },
+  "hostedBuild": {
+    "schemaVersion": "clero.project.v1",
+    "name": "Clero",
+    "pages": 7,
+    "headings": 29,
+    "contentBytes": 10769,
+    "htmlPages": 9,
+    "output": "public/",
+    "files": 26,
+    "node": "v26.13.0"
+  },
+  "checks": {
+    "staticSyntaxAndStructure": "passed",
+    "authoredCases": 72,
+    "authoredCasesExecuted": 0,
+    "temporaryCiApproval": "requested; unanswered",
+    "activeWorkflows": 0,
+    "sourceActionsRuns": 0
+  },
+  "publicHttp": {
+    "url": "https://clero-alvaro.vercel.app/introduction/",
+    "verified": false,
+    "localResult": "DNS resolution failed",
+    "publicFetchResult": "URL inaccessible via web fetch",
+    "shareLinksCreated": 0,
+    "authSettingsChanged": false
+  },
+  "limits": [
+    "Build/source proof does not establish browser, no-JavaScript rendering, history, clipboard, private device storage or CLI safety acceptance.",
+    "Local build blocked: Storage Guard measured 18.4 GiB free versus 34.0 GiB required.",
+    "The original 48-check approval request is bound to source79813554c1449d6c48775fbd3d65626a45634f7b; expanded72 scope has no execution approval.",
+    "Custom accent applies on hydration; static brand/blockquote borders use the default stylesheet accent.",
+    "Full Clero/reference-product and portfolio completion remain unproven and unfinished."
+  ],
+  "next": "Await approval of the immutable72-case proposal; browser acceptance remains separate."
+}
