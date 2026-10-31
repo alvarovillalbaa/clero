@@ -4,10 +4,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { normalizeProject } from '../web/lib/model.mjs';
-import { renderMarkdown } from '../web/lib/markdown.mjs';
+import { createStaticFiles, normalizeSiteUrl, preparePublication } from '../lib/publication.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const ASSETS = ['index.html', 'app.mjs', 'styles.css', 'favicon.svg', 'lib/model.mjs', 'lib/markdown.mjs'];
+const ASSETS = ['app.mjs', 'styles.css', 'favicon.svg', 'lib/model.mjs', 'lib/markdown.mjs', 'lib/routes.mjs'];
 const decoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const fail = message => { throw new Error(message); };
@@ -82,24 +82,6 @@ function loadProject(input) {
   return normalizeProject({ ...skeleton, pages });
 }
 
-function validateContent(project) {
-  const knownSlugs = project.pages.map(page => page.slug);
-  const renderedPages = new Map(); let headings = 0;
-  for (const page of project.pages) {
-    const rendered = renderMarkdown(page.content, { knownSlugs, currentSlug: page.slug });
-    if (rendered.warnings.length) fail(`Page ${page.slug}: ${rendered.warnings.join('; ')}`);
-    renderedPages.set(page.slug, rendered);
-    headings += rendered.headings.length;
-  }
-  for (const [slug, rendered] of renderedPages) for (const link of rendered.links) {
-    if (!link.external && link.fragment && !renderedPages.get(link.slug)?.headings.some(heading => heading.id === link.fragment)) {
-      fail(`Page ${slug}: Missing internal heading in ${link.slug}`);
-    }
-  }
-  return { schemaVersion: project.schemaVersion, name: project.name, pages: project.pages.length, headings,
-    contentBytes: project.pages.reduce((sum, page) => sum + Buffer.byteLength(page.content, 'utf8'), 0) };
-}
-
 /** Exclusive directory ownership; a failed write removes only unchanged files we created. */
 function writeNewDirectory(destination, files) {
   const requested = path.resolve(destination), parent = fs.realpathSync(path.dirname(requested));
@@ -158,15 +140,32 @@ function writeNewDirectory(destination, files) {
   }
 }
 
-function build(input, destination) {
-  const project = loadProject(input), summary = validateContent(project);
+function build(input, destination, siteUrl) {
+  const publication = createStaticFiles(loadProject(input), readText(path.join(ROOT, 'web/index.html'), 512 * 1024),
+    siteUrl === undefined ? {} : { siteUrl });
+  const { project, summary } = publication;
   const files = ASSETS.map(asset => [asset, readText(path.join(ROOT, 'web', asset), 512 * 1024)]);
+  files.push(...publication.files);
   files.push(['project.json', `${JSON.stringify(project, null, 2)}\n`]);
   for (const page of project.pages) files.push([`source/${page.slug}.md`, page.content]);
   const manifest = { schemaVersion: 'clero.output.v1', buildId: randomUUID(),
     files: files.map(([filename, text]) => ({ path: filename, sha256: sha(Buffer.from(text)) })) };
   files.push(['clero-output.json', `${JSON.stringify(manifest, null, 2)}\n`]);
-  return { ...summary, ...writeNewDirectory(destination, files) };
+  return { ...summary, htmlPages: publication.files.filter(([filename]) => filename.endsWith('.html')).length,
+    ...writeNewDirectory(destination, files) };
+}
+
+function buildOptions(args) {
+  let destination, siteUrl;
+  for (let index = 0; index < args.length; index += 2) {
+    const flag = args[index], value = args[index + 1];
+    if (!value || value.startsWith('--')) fail('Build options require values');
+    if (flag === '--out' && destination === undefined) destination = value;
+    else if (flag === '--site-url' && siteUrl === undefined) siteUrl = normalizeSiteUrl(value);
+    else fail('Unknown or repeated build option');
+  }
+  if (!destination) fail('A new output directory is required with --out');
+  return { destination, siteUrl };
 }
 
 function initialize(destination) {
@@ -183,14 +182,14 @@ function initialize(destination) {
 function main(args) {
   const [command, input, ...rest] = args;
   if (!command || command === '--help' || command === 'help') {
-    process.stdout.write('Clero\n\n  node bin/clero.mjs init <new-directory>\n  node bin/clero.mjs check <directory-or-project.json>\n  node bin/clero.mjs build <directory-or-project.json> --out <new-directory>\n\nNo server, dependency installation, upload or account is started automatically.\n');
+    process.stdout.write('Clero\n\n  node bin/clero.mjs init <new-directory>\n  node bin/clero.mjs check <directory-or-project.json>\n  node bin/clero.mjs build <directory-or-project.json> --out <new-directory> [--site-url https://docs.example.com/]\n\nBuilds contain readable HTML pages. --site-url additionally emits canonical URLs, sitemap.xml and robots.txt.\nNo server, dependency installation, upload or account is started automatically.\n');
     return;
   }
   if (!input) fail('A project path is required');
   let result;
   if (command === 'init' && rest.length === 0) result = initialize(input);
-  else if (command === 'check' && rest.length === 0) result = validateContent(loadProject(input));
-  else if (command === 'build' && rest.length === 2 && rest[0] === '--out' && rest[1]) result = build(input, rest[1]);
+  else if (command === 'check' && rest.length === 0) result = preparePublication(loadProject(input)).summary;
+  else if (command === 'build') { const options = buildOptions(rest); result = build(input, options.destination, options.siteUrl); }
   else fail('Unknown command or arguments; use --help');
   process.stdout.write(`${JSON.stringify(result)}\n`);
 }

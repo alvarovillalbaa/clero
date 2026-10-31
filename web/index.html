@@ -1,19 +1,23 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" class="no-js" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Clero — a quiet place for your documentation. Read, write and export a Markdown workspace on your device.">
   <meta name="color-scheme" content="light dark">
+  <!-- clero:head:start -->
+  <meta name="description" content="Clero — a quiet place for your documentation. Read, write and export a Markdown workspace on your device.">
   <title>Clero · Documentation</title>
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css">
-  <script type="module" src="./app.mjs"></script>
+  <!-- clero:head:end -->
+  <link rel="icon" href="__CLERO_BASE__favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="__CLERO_BASE__styles.css">
+  <script type="module" src="__CLERO_BASE__app.mjs"></script>
 </head>
-<body>
+<body data-clero-page="">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="masthead">
+    <!-- clero:brand:start -->
     <a id="home-link" class="brand" href="?page=introduction" aria-label="Documentation home"><span class="brand-mark" aria-hidden="true">c.</span><span id="project-name">Clero</span></a>
+    <!-- clero:brand:end -->
     <div class="masthead-actions">
       <button id="nav-toggle" class="quiet-button mobile-only" type="button" aria-expanded="false" aria-controls="reader-navigation">Contents</button>
       <button id="open-search" class="search-trigger" type="button" aria-haspopup="dialog"><span>Search docs</span><kbd aria-hidden="true">⌘ K</kbd></button>
@@ -28,20 +32,34 @@
   <div id="reader-view" class="reader-layout">
     <aside id="reader-navigation" class="navigation" aria-label="Documentation navigation">
       <div class="rail-caption">THE FIELD GUIDE</div>
+      <!-- clero:description:start -->
       <p id="project-description" class="project-description">Clear words. A little room to think.</p>
-      <nav id="page-nav" aria-label="Pages"><p class="subtle">Loading documentation…</p></nav>
+      <!-- clero:description:end -->
+      <nav id="page-nav" aria-label="Pages">
+        <!-- clero:navigation:start -->
+        <p class="subtle">Loading documentation…</p>
+        <!-- clero:navigation:end -->
+      </nav>
       <div class="rail-colophon"><span>Written in Markdown.</span><span>Published with <a href="https://github.com/alvarovillalbaa/clero" target="_blank" rel="noopener noreferrer">Clero</a>.</span></div>
     </aside>
     <main id="main" class="reading-room" tabindex="-1">
       <article id="document" aria-labelledby="page-title">
+        <!-- clero:article:start -->
         <header class="document-header"><p id="page-group" class="eyebrow">DOCUMENTATION</p><h1 id="page-title">A place for the details.</h1><p id="page-description" class="document-description">Opening the published project…</p></header>
         <div id="document-content" class="prose" aria-busy="true"><p>Loading the actual project file.</p></div>
         <div id="render-warnings" class="render-warnings" hidden></div>
+        <!-- clero:article:end -->
       </article>
-      <nav id="page-neighbours" class="page-neighbours" aria-label="Previous and next pages"></nav>
+      <nav id="page-neighbours" class="page-neighbours" aria-label="Previous and next pages">
+        <!-- clero:neighbours:start -->
+        <!-- clero:neighbours:end -->
+      </nav>
       <footer class="reading-footer"><span class="tiny-mark" aria-hidden="true">c.</span><span>Good documentation leaves room for the reader.</span></footer>
     </main>
-    <aside class="contents-rail" aria-labelledby="contents-title"><h2 id="contents-title">On this page</h2><nav id="heading-nav" aria-label="On this page"></nav></aside>
+    <aside class="contents-rail" aria-labelledby="contents-title"><h2 id="contents-title">On this page</h2><nav id="heading-nav" aria-label="On this page">
+      <!-- clero:contents:start -->
+      <!-- clero:contents:end -->
+    </nav></aside>
   </div>
 
   <section id="workspace-view" class="workspace" aria-labelledby="workspace-title" hidden>
@@ -80,6 +98,6 @@ node bin/clero.mjs build ./clero-workspace.json --out ./my-docs-site</code></pre
     <p id="search-status" class="search-status" role="status" aria-live="polite">Type to search this project.</p><ul id="search-results" class="search-results"></ul>
     <p class="search-footnote">Search stays in this browser. Use Tab to choose a result.</p>
   </dialog>
-  <noscript><p class="global-status">Clero's interactive reader requires JavaScript. Your original Markdown files and exported JSON remain portable.</p></noscript>
+  <noscript><p class="global-status">The published pages remain readable without JavaScript. Search, theme controls, code copy and the local workspace need JavaScript. Your original Markdown and exported JSON remain portable.</p></noscript>
 </body>
 </html>

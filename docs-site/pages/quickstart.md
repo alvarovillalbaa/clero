@@ -28,7 +28,8 @@ node bin/clero.mjs build ./my-docs --out ./my-docs-site
 ```
 
 The output directory must be new. Clero refuses to overwrite an existing
-directory. For another local build, choose a fresh output path.
+directory. For another local build, choose a fresh output path. Every configured
+page has actual HTML at its directory URL; basic reading needs no JavaScript.
 
 Serve that directory with your usual static web server or upload it to your
 static host. Open the site over HTTP; browser modules are not designed for a

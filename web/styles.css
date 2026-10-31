@@ -97,6 +97,8 @@ kbd { font-size: .7rem; white-space: nowrap; }
 .tiny-mark { font-size: 1.8rem; }
 .subtle { color: var(--muted); font-size: .82rem; line-height: 1.65; }
 .mobile-only { display: none; }
+.no-js .masthead-actions, .no-js .code-block > button[data-code-index] { display: none; }
+.no-js .navigation { display: block; }
 .workspace { max-width: 1540px; padding: 3rem; margin: 0 auto; }
 .workspace-header { display: flex; justify-content: space-between; align-items: start; gap: 2rem; margin-bottom: 1.5rem; }
 .workspace-header h1 { font-size: clamp(2.2rem, 4vw, 3.5rem); line-height: 1.1; margin: .65rem 0 1rem; }
@@ -132,7 +134,7 @@ summary { cursor: pointer; font-size: .82rem; line-height: 1.7; }.project-settin
 .search-status, .search-footnote { font-size: .73rem; line-height: 1.6; color: var(--muted); margin: .9rem 0; }.search-results { padding: 0; margin: 0; list-style: none; }
 .search-result { display: grid; gap: .35rem; padding: 1rem .35rem; border-top: 1px solid var(--rule); color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }.search-result:hover { background: var(--code); }.search-result strong { font-size: .95rem; font-weight: 500; }.result-excerpt { font-size: .78rem; line-height: 1.65; color: var(--muted); }
 @media (min-width: 1650px) { .reader-layout { grid-template-columns: 250px minmax(0, 700px) 185px; gap: 4rem; } }
-@media (max-width: 1200px) { .reader-layout { grid-template-columns: 210px minmax(0, 1fr); gap: 2.5rem; }.contents-rail { display: none; }.workspace-editor { grid-template-columns: minmax(0, 1fr); }.workspace-preview { border-left: 0; border-top: 1px solid var(--rule); padding: 2rem 0 0; }.project-description { max-width: 170px; } }
+@media (max-width: 1200px) { .reader-layout { grid-template-columns: 210px minmax(0, 1fr); gap: 2.5rem; }.contents-rail { display: none; }.no-js .contents-rail { display: block; position: static; grid-column: 2; max-height: none; padding-bottom: 2rem; }.workspace-editor { grid-template-columns: minmax(0, 1fr); }.workspace-preview { border-left: 0; border-top: 1px solid var(--rule); padding: 2rem 0 0; }.project-description { max-width: 170px; } }
 @media (max-width: 800px) {
   .masthead { min-height: 72px; padding: .8rem 1.2rem; gap: .7rem; }.masthead-actions { gap: .7rem; }.brand { gap: .5rem; }.brand-mark { font-size: 2.1rem; padding-left: .4rem; }#project-name { max-width: 160px; font-size: .9rem; }
   .search-trigger { min-width: 0; min-height: 42px; padding: .5rem; border: 0; background: transparent; gap: 0; }.search-trigger span { font-size: 0; }.search-trigger span::after { content: "⌕"; font: 1.65rem/1 Georgia, serif; }.search-trigger kbd { display: none; }.workspace-toggle { font-size: .75rem; padding-left: .7rem; }.workspace-toggle span { display: none; }.theme-button { min-width: 28px; }

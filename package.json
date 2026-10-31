@@ -5,6 +5,6 @@
   "description": "An owned Markdown documentation publisher",
   "type": "module",
   "engines": { "node": ">=24.21.0" },
-  "scripts": { "build": "node bin/clero.mjs build docs-site --out public" },
+  "scripts": { "build": "node bin/clero.mjs build docs-site --out public --site-url https://clero-alvaro.vercel.app/" },
   "bin": { "clero": "bin/clero.mjs" }
 }

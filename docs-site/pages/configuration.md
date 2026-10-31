@@ -27,6 +27,8 @@ The directory has a **clero.json** file:
 
 Page order is navigation order. Groups preserve their first appearance. Slugs
 use lowercase letters, numbers and hyphens, with slashes for nested paths.
+Each slug segment has at most 252 ASCII characters so its original Markdown
+filename fits the usual 255-byte filesystem component limit.
 Files must be relative Markdown paths inside the chosen project. Final source
 inputs and declared page path segments cannot be symlinks. Parent directory
 aliases supplied as part of a source path are resolved normally.

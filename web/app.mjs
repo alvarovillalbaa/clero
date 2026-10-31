@@ -1,5 +1,6 @@
-import { normalizeProject, normalizeSlug, hrefForPage } from "./lib/model.mjs";
-import { renderMarkdown } from "./lib/markdown.mjs";
+import { normalizeProject, normalizeSlug } from "./lib/model.mjs";
+import { escapeHtml, renderMarkdown } from "./lib/markdown.mjs";
+import { pageURL, parsePageURL } from "./lib/routes.mjs";
 
 const $ = id => document.getElementById(id);
 const MAX_FILE = 5 * 1024 * 1024;
@@ -7,6 +8,8 @@ const MAX_SAVED = 2 * 1024 * 1024;
 const WORKSPACE_KEY = "clero.workspace.v1";
 const THEME_KEY = "clero.theme.v1";
 const encoder = new TextEncoder();
+const siteBase = new URL("./", import.meta.url).href;
+const staticPage = document.body.dataset.cleroPage;
 let project = null, published = null, selected = null, source = "published";
 let appliedDirty = false, editorDirty = false, workspaceOpen = false, menuOpen = false;
 let savedRaw = null, historyStep = Number.isSafeInteger(history.state?.cleroStep) && history.state.cleroStep >= 0 ? history.state.cleroStep : 0, restoringHistory = false;
@@ -43,11 +46,33 @@ function rendered(page) {
   if (!renderCache.has(page.slug)) renderCache.set(page.slug, renderMarkdown(page.content, { knownSlugs: project.pages.map(item => item.slug), currentSlug: page.slug }));
   return renderCache.get(page.slug);
 }
-function projectURL(slug, hash = "") { return `${hrefForPage(slug)}${hash ? `#${encodeURIComponent(hash)}` : ""}`; }
+function projectURL(slug, hash = "") {
+  const url = new URL(pageURL(slug, siteBase, hash));
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+function prettyMarkdown(html) {
+  // Only shared-renderer page anchors match; keep their already escaped fragments intact.
+  return html.replace(/<a href="\?page=([^"#]+)(#[^"]*)?"/g, (anchor, encoded, fragment = "") => {
+    let slug; try { slug = decodeURIComponent(encoded); } catch { return anchor; }
+    return pageBySlug(slug) ? `<a href="${escapeHtml(projectURL(slug))}${fragment}"` : anchor;
+  });
+}
+function isPublishedReader() { return source === "published" && !appliedDirty && !workspaceOpen; }
 function requestedPage() {
-  const value = new URL(location.href).searchParams.get("page");
-  if (value === null) return project.pages[0].slug;
-  try { return normalizeSlug(value); } catch { return null; }
+  const route = parsePageURL(location.href, siteBase);
+  return route ? route.root ? project.pages[0].slug : route.slug : null;
+}
+function migrateLegacyURL() {
+  const route = parsePageURL(location.href, siteBase);
+  if (!route?.legacy || !currentPage()) return false;
+  if (isPublishedReader()) {
+    if (!confirmUnapplied()) return true;
+    editorDirty = false;
+    location.replace(projectURL(selected, route.fragment));
+    return true;
+  }
+  writeURL(selected, route.fragment, true);
+  return false;
 }
 function writeURL(slug, hash = "", replace = false) {
   if (!replace) historyStep += 1;
@@ -74,7 +99,7 @@ function renderAll() {
   $("project-name").textContent = project.name;
   $("project-description").textContent = project.description;
   document.documentElement.style.setProperty("--project-accent", project.accent);
-  $("home-link").href = hrefForPage(project.pages[0].slug);
+  $("home-link").href = projectURL(project.pages[0].slug);
   renderNavigation(); renderReader(); renderWorkspacePages(); updateWorkspaceState();
 }
 function renderNavigation() {
@@ -89,7 +114,7 @@ function renderNavigation() {
     const section = node("section", "nav-group"), heading = node("h2", "nav-group-title", name), list = node("ul");
     for (const page of pages) {
       const item = node("li"), link = node("a", "page-link", page.title);
-      link.href = hrefForPage(page.slug); link.dataset.page = page.slug;
+      link.href = projectURL(page.slug); link.dataset.page = page.slug;
       if (page.slug === selected) link.setAttribute("aria-current", "page");
       item.append(link); list.append(item);
     }
@@ -123,7 +148,7 @@ function renderReader() {
   $("page-group").textContent = page.group || "DOCUMENTATION";
   document.title = `${page.title} · ${project.name}`;
   // Keep only one rendered Markdown body in the DOM, so preview and reader IDs never duplicate.
-  if (!workspaceOpen) content.innerHTML = result.html;
+  if (!workspaceOpen) content.innerHTML = prettyMarkdown(result.html);
   for (const heading of result.headings) {
     const link = node("a", `heading-link level-${heading.level}`, heading.text);
     link.href = projectURL(page.slug, heading.id); contents.append(link);
@@ -133,7 +158,7 @@ function renderReader() {
   const index = project.pages.findIndex(item => item.slug === selected);
   for (const [direction, neighbour] of [["Previous", project.pages[index - 1]], ["Next", project.pages[index + 1]]]) {
     if (!neighbour) { neighbours.append(node("span")); continue; }
-    const link = node("a", "neighbour-link"); link.href = hrefForPage(neighbour.slug);
+    const link = node("a", "neighbour-link"); link.href = projectURL(neighbour.slug);
     link.append(node("span", "eyebrow", direction), node("span", "neighbour-title", neighbour.title)); neighbours.append(link);
   }
 }
@@ -160,6 +185,11 @@ function setMenu(open) {
   $("nav-toggle").setAttribute("aria-expanded", String(open));
 }
 function setWorkspace(open) {
+  if (!open && project && source === "published" && !appliedDirty && !editorDirty && currentPage() && selected !== staticPage) {
+    const route = parsePageURL(location.href, siteBase);
+    location.assign(projectURL(selected, route?.fragment ?? ""));
+    return;
+  }
   if (open && project && !currentPage()) { selected = project.pages[0].slug; writeURL(selected, "", true); renderAll(); fillEditor(); }
   workspaceOpen = open;
   $("workspace-view").hidden = !open; $("reader-view").hidden = open;
@@ -186,7 +216,7 @@ function renderPreview() {
   const page = currentPage(); if (!page || !workspaceOpen) return;
   const result = rendered(page);
   $("preview-title").textContent = page.title; $("preview-description").textContent = page.description;
-  $("editor-preview").innerHTML = result.html;
+  $("editor-preview").innerHTML = prettyMarkdown(result.html);
   showWarnings($("preview-warnings"), result.warnings);
 }
 function updateWorkspaceState() {
@@ -223,7 +253,7 @@ function restoreSaved() {
     const restored = normalizeProject(saved.project);
     const prepared = prepareRendering(restored);
     project = restored; source = "device"; appliedDirty = false; selected = requestedPage();
-    renderCache = prepared; renderAll(); fillEditor(); requestAnimationFrame(() => scrollToHeading(location.hash));
+    renderCache = prepared; migrateLegacyURL(); renderAll(); fillEditor(); requestAnimationFrame(() => scrollToHeading(location.hash));
     status("Restored the saved workspace from this device. It has not been published.");
   } catch {
     globalStatus("The saved workspace could not be restored. Published docs will still open. Import an export, or explicitly discard the saved copy in Workspace.");
@@ -285,7 +315,7 @@ async function importWorkspace(file) {
 }
 
 function openSearch() {
-  if (!project) { globalStatus("Import a project or wait for the published documentation before searching."); return; }
+  if (!project) { globalStatus("Search needs project data. You can keep reading the published pages or import a local workspace."); return; }
   searchReturnFocus = document.activeElement;
   if (!$("search-dialog").open) $("search-dialog").showModal();
   $("search-input").value = ""; renderSearch(); $("search-input").focus();
@@ -305,7 +335,7 @@ function renderSearch() {
   matches.sort((a, b) => b.score - a.score);
   $("search-status").textContent = matches.length ? `${matches.length} matching ${matches.length === 1 ? "page" : "pages"}${matches.length > 30 ? "; showing the first 30" : ""}.` : "No matching pages. Try a different word.";
   for (const { page, plain } of matches.slice(0, 30)) {
-    const item = node("li"), link = node("a", "search-result"); link.href = hrefForPage(page.slug);
+    const item = node("li"), link = node("a", "search-result"); link.href = projectURL(page.slug);
     const first = Math.max(0, plain.toLowerCase().indexOf(terms[0]) - 40);
     link.append(node("span", "eyebrow", page.group || "Page"), node("strong", "", page.title), node("span", "result-excerpt", page.description || plain.slice(first, first + 180)));
     item.append(link); list.append(item);
@@ -355,13 +385,15 @@ async function loadPublished() {
     published = loaded;
     if (!project) {
       project = published; renderCache = prepared; selected = requestedPage();
-      if (!new URL(location.href).searchParams.has("page")) writeURL(project.pages[0].slug, "", true);
+      if (migrateLegacyURL()) return;
       renderAll(); fillEditor(); requestAnimationFrame(() => scrollToHeading(location.hash));
     }
     updateWorkspaceState();
   } catch {
-    globalStatus(project ? "The published project could not be loaded. Your local working copy remains available." : "The published project could not be opened. Use Workspace to import a local project JSON file.");
-    if (!project) { $("page-title").textContent = "Bring your own words."; $("page-description").textContent = "Import a project JSON file in Workspace to begin locally."; $("document-content").replaceChildren(); $("document-content").setAttribute("aria-busy", "false"); $("page-nav").replaceChildren(node("p", "subtle", "No published project is available.")); }
+    const hasStaticPage = typeof staticPage === "string" && staticPage.length > 0;
+    globalStatus(project ? "The published project data could not be loaded. Your local working copy remains available." : hasStaticPage ? "Interactive project data could not be loaded. The published HTML remains readable; search and workspace editing need project data or a local import." : "The published project could not be opened. Use Workspace to import a local project JSON file.");
+    if (!project && hasStaticPage) $("document-content").setAttribute("aria-busy", "false");
+    if (!project && !hasStaticPage) { $("page-title").textContent = "Bring your own words."; $("page-description").textContent = "Import a project JSON file in Workspace to begin locally."; $("document-content").replaceChildren(); $("document-content").setAttribute("aria-busy", "false"); $("page-nav").replaceChildren(node("p", "subtle", "No published project is available.")); }
   } finally { clearTimeout(timer); controller.abort(); }
 }
 
@@ -405,12 +437,18 @@ document.addEventListener("click", event => {
   if (pageButton) { if (pageButton.dataset.workspacePage !== selected && confirmUnapplied()) { selected = pageButton.dataset.workspacePage; writeURL(selected); editorDirty = false; renderAll(); fillEditor(); error(""); } return; }
   const link = target?.closest("a[href]");
   if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target || link.hasAttribute("download")) return;
-  const url = new URL(link.href, location.href);
-  if (url.origin !== location.origin || url.pathname !== location.pathname || (!url.searchParams.has("page") && !url.hash)) return;
-  const slug = url.searchParams.get("page") || selected; if (!pageBySlug(slug)) return;
+  const route = parsePageURL(link.href, siteBase);
+  if (!route || !project) return;
+  const slug = route.root ? project.pages[0].slug : route.slug; if (!pageBySlug(slug)) return;
+  if (slug !== selected && isPublishedReader()) {
+    if (!confirmUnapplied()) { event.preventDefault(); return; }
+    editorDirty = false;
+    link.href = projectURL(slug, route.fragment);
+    if ($("search-dialog").open) closeSearch(false);
+    return;
+  }
   event.preventDefault(); if ($("search-dialog").open) closeSearch(false);
-  let hash = ""; try { hash = decodeURIComponent(url.hash.slice(1)); } catch {}
-  navigate(slug, hash);
+  navigate(slug, route.fragment);
 });
 document.addEventListener("keydown", event => {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); if ($("search-dialog").open) closeSearch(); else openSearch(); }
@@ -426,7 +464,14 @@ window.addEventListener("popstate", event => {
     return;
   }
   if (Number.isSafeInteger(targetStep) && targetStep >= 0) historyStep = targetStep;
-  currentURL = location.href; selected = requested; if (changed) editorDirty = false; renderAll();
+  currentURL = location.href; selected = requested; if (changed) editorDirty = false;
+  if (changed && currentPage() && isPublishedReader()) {
+    const route = parsePageURL(location.href, siteBase);
+    location.replace(projectURL(selected, route?.fragment ?? ""));
+    return;
+  }
+  if (migrateLegacyURL()) return;
+  renderAll();
   if (workspaceOpen && !currentPage()) setWorkspace(false);
   else if (workspaceOpen && changed) fillEditor();
   else if (!workspaceOpen) requestAnimationFrame(() => scrollToHeading(location.hash));
@@ -436,4 +481,4 @@ window.addEventListener("storage", event => { if (event.key === WORKSPACE_KEY &&
 window.addEventListener("pagehide", () => { for (const url of downloads) URL.revokeObjectURL(url); downloads.clear(); });
 
 history.replaceState({ cleroStep: historyStep }, "", location.href);
-restoreTheme(); restoreSaved(); void loadPublished();
+restoreTheme(); restoreSaved(); document.documentElement.classList.remove("no-js"); void loadPublished();

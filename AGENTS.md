@@ -4,6 +4,9 @@
   brief and implementation interpretation are recorded in docs/spec.md.
 - web/lib/model.mjs and web/lib/markdown.mjs are shared browser/CLI contracts.
   Keep them dependency-free and do not fork validation or Markdown behavior.
+- web/lib/routes.mjs owns pretty/legacy URL grammar; lib/publication.mjs owns
+  validated static HTML, navigation and indexing metadata. Keep project data
+  outside executable templates and reuse the shared renderer.
 - Documentation is data. Never evaluate MDX, raw HTML, scripts or user-supplied
   template code. DOM labels use textContent; rendered HTML comes only from the
   closed shared renderer. Imports stay on the user's device until exported.

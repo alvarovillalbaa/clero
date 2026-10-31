@@ -80,11 +80,14 @@ test('slugs retain lowercase nested identities and page hrefs encode their path 
   assert.equal(normalizeSlug('guide/start-2'), 'guide/start-2');
   assert.equal(hrefForPage('guide/start-2'), '?page=guide%2Fstart-2');
   assert.equal(normalizeProject(project({ pages: [page({ slug: '0-start' })] })).pages[0].slug, '0-start');
+  assert.equal(normalizeSlug('a'.repeat(252)), 'a'.repeat(252));
 });
 
 test('slugs reject traversal reserved runtime paths ambiguous encodings and excessive depth', () => {
   for (const slug of ['', 'Upper', '/start', 'start/', 'a//b', '.', '..', '../start', 'a/../b', 'a.md', 'a?x=1', 'a#part', 'a%2fb', '__proto__', 'a_b', 'café', 'a\\b', 'assets', 'a/assets/b', 'lib', 'a/lib', 'project.json', 'a'.repeat(513), Array(33).fill('a').join('/')]) assert.throws(() => normalizeSlug(slug));
   assert.throws(() => hrefForPage('bad?route'));
+  assert.throws(() => normalizeSlug('a'.repeat(253)));
+  assert.throws(() => normalizeSlug(`guide/${'a'.repeat(253)}`));
 });
 
 test('projects reject duplicate slug identities and absent required page fields', () => {

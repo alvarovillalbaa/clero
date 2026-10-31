@@ -24,12 +24,24 @@ and [navigation](https://www.mintlify.com/docs/organize/navigation). These estab
 the docs-as-code publishing and navigation category. No code, branding, assets,
 configuration compatibility or hosted-service parity is borrowed or implied.
 
+The initial output deferred its actual document to browser JavaScript. The
+publication increment generates each readable page and navigation in HTML,
+with pretty directory URLs and optional page metadata/sitemap/robots output.
+This is another implementation step toward a usable documentation publisher,
+grounded in [the reference's current SEO documentation](https://www.mintlify.com/docs/optimize/seo),
+not a claim of search ranking, indexing, full parity or new owner requirements.
+
 ## Initial product contract
 
 - A project has ordered Markdown pages, titles, descriptions, groups and stable
   slugs. One strict versioned bundle is shared by browser and CLI.
 - A real reader has page navigation, URL/reload selection, heading anchors,
   contents, full-text search, code copy, light/dark preference and a narrow view.
+- Published page content, navigation and contents exist in static HTML. Each
+  slug has a directory URL; JavaScript preserves earlier query-link selection
+  and adds search/editing. Optional declared HTTPS site roots supply canonical
+  metadata, a sitemap and robots file. 404 recovery uses that mount path; without
+  it, recovery assumes the host root. No indexing/ranking outcome is promised.
 - A workspace lets users import/export actual project JSON, edit content and
   metadata, add/remove pages, preview changes, and explicitly save drafts on
   this device. Storage failures remain visible. Nothing uploads automatically.

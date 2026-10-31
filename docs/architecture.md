@@ -16,8 +16,15 @@ subset, without image loading, MDX evaluation or a CommonMark parity claim.
 ## Browser
 
 `web/app.mjs` loads the actual published `project.json`. Reader navigation uses
-query-page URLs and independent heading fragments. User labels are DOM text;
-only the shared renderer produces inserted article HTML. Search stays local.
+`web/lib/routes.mjs` for pretty page URLs, independent heading fragments and
+legacy query links. Static HTML stays readable if project-data loading fails.
+Clean public-reader page changes use native document navigation, keeping the
+generated head, canonical URL and asset base aligned with the article. Public
+legacy query links replace the document at its pretty URL. Returning from an
+unmodified published workspace reloads when its selected page differs from the
+original static article. Private/device/imported/edited copies remain in-tab.
+User labels are DOM text; only the shared renderer produces inserted article
+HTML, with its known-page hrefs rewritten to pretty URLs. Search stays local.
 
 The workspace edits a copied project, applies normalized previews and exports
 the original Markdown in portable JSON. Saving a draft is explicit and scoped
@@ -33,8 +40,17 @@ allocation/UTF-8 bounds; the final input and declared page path segments reject
 symlinks. Parent aliases supplied with an input resolve normally. The tool does
 not claim protection against a hostile process racing every filesystem call.
 
-Before writing, the CLI validates all page and heading links using renderer
-metadata. It never fetches an external URL. Output is a new exclusively claimed
+Before writing, `lib/publication.mjs` validates all page and heading links using
+renderer metadata. It never fetches an external URL. It fills explicit trusted
+template markers with escaped metadata, navigation and actual Markdown HTML.
+Page assets and links are relative to their depth; 404 recovery uses the
+configured site-root path or defaults to host root. Assets replace placeholders
+before document data is inserted, preserving identical strings in user data.
+Canonical URLs, robots and a sitemap are emitted only for an explicit validated
+HTTPS site root; there are no invented hostnames, timestamps or organization
+claims. Query links remain a browser compatibility path.
+
+Output is a new exclusively claimed
 directory. Assets, the normalized project, source Markdown and an unsigned hash
 manifest are written with exclusive file creation. Error cleanup checks owned
 directory/file identities and content; unexpected changes are preserved.
@@ -42,8 +58,10 @@ Existing destinations are refused, including previous generated destinations.
 
 `docs-site/` contains authored Clero documentation. The initial Vercel build runs
 the CLI on it to create `public/`; it installs no packages. That necessary hosted
-build is separate from the 48 authored local model/renderer/filesystem cases.
-Those tests and browser acceptance remain approval-gated and unrun.
+build is separate from authored domain/filesystem cases. The initial 48-check
+scope remains pinned to its original source. Static publication adds separately
+proposed routing/publication cases and adapts the model boundary and CLI output assertions.
+All authored tests and browser acceptance remain approval-gated and unrun.
 
 ## Boundaries
 

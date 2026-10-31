@@ -38,6 +38,8 @@ function label(value, maximum, empty = false) {
 export function normalizeSlug(value) {
   if (typeof value !== 'string' || !value || value.length > 512 || !/^[a-z0-9][a-z0-9-]*(?:\/[a-z0-9][a-z0-9-]*)*$/.test(value)) fail('project_slug_invalid');
   const segments = value.split('/');
+  // The final source filename adds '.md' beneath a common 255-byte component limit.
+  if (segments.some(part => part.length > 252)) fail('project_slug_invalid');
   if (segments.length > 32 || segments.some(part => ['assets', 'lib', 'project.json'].includes(part))) fail('project_slug_reserved');
   return value;
 }
