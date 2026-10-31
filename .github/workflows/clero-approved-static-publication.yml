@@ -109,6 +109,15 @@ jobs:
             }
             outcome.totals = totals; outcome.observedCases = names.length;
             for (const name of names.slice(0, 72)) console.log(`case ${JSON.stringify(name.slice(0, 512))}`);
+            let diagnosticBudget = 16384;
+            for (let index = 0; index < lines.length && diagnosticBudget > 0; index++) {
+              if (!/^not ok [0-9]+ - /.test(lines[index])) continue;
+              const details = [lines[index]];
+              for (let next = index + 1; next < Math.min(lines.length, index + 49) && !lines[next].startsWith('# Subtest: '); next++) details.push(lines[next]);
+              const diagnostic = details.join('\n').slice(0, diagnosticBudget);
+              diagnosticBudget -= diagnostic.length;
+              console.log(`failure ${JSON.stringify(diagnostic)}`);
+            }
             assert.equal(outcome.spawnError, undefined); assert.equal(outcome.controlError, undefined); assert.equal(outcome.logError, undefined);
             assert.equal(outcome.stopReason, null); assert.equal(outcome.exitCode, 0); assert.equal(outcome.signal, null);
             equal(totals, { tests: 72, suites: 0, pass: 72, fail: 0, cancelled: 0, skipped: 0, todo: 0 });
