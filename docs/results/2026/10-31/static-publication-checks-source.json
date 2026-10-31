@@ -1,0 +1,374 @@
+{
+  "schemaVersion": "clero.static-publication-source.v1",
+  "repository": "alvarovillalbaa/clero",
+  "referenceCommit": "6f28d775053359d332c17104d5df6a508cd365b5",
+  "scope": "Approved same72-case assertion repair and failure diagnostics; no runtime behavior change",
+  "runtime": {
+    "node": "24.21.0",
+    "runner": "ubuntu-24.04",
+    "jobMinutes": 4,
+    "approvedAggregateJobMinutes": 5,
+    "completedPriorJobSeconds": 32,
+    "testWallClockSeconds": 120,
+    "dependenciesInstalled": false
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "gitSha": "62c31d3bd79bb84bcfa239802de9c651c52b6fa9"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "gitSha": "00b258432c933a1903f88d6e6b0a02d6bfbbb11c"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "gitSha": "7694388483b2d169819b727c2484e0e748498f4c"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "gitSha": "e98c01b779b8229604fcbafb6395bac3a56f9b12"
+    },
+    {
+      "path": "bin/clero.mjs",
+      "mode": "100755",
+      "gitSha": "34cc8a2a9d7cc9cc105456777ed71db58cc23e37"
+    },
+    {
+      "path": "docs-site/clero.json",
+      "mode": "100644",
+      "gitSha": "e9d29aa838f49bb2bca954a67c686a2b9fe92179"
+    },
+    {
+      "path": "docs-site/pages/configuration.md",
+      "mode": "100644",
+      "gitSha": "3e1af24fe778389b17a1c9cf2a8cdddbcd81658b"
+    },
+    {
+      "path": "docs-site/pages/introduction.md",
+      "mode": "100644",
+      "gitSha": "ef89dbf4fb5a539c1fd4682ecb1f07e83e169d52"
+    },
+    {
+      "path": "docs-site/pages/limits.md",
+      "mode": "100644",
+      "gitSha": "7d4c44f9a0f242a42bbb3c1bee3ee9f9ec424785"
+    },
+    {
+      "path": "docs-site/pages/publishing.md",
+      "mode": "100644",
+      "gitSha": "c048d04a01add9659fc86995b035686dfdaf1f4c"
+    },
+    {
+      "path": "docs-site/pages/quickstart.md",
+      "mode": "100644",
+      "gitSha": "cf7f2ca443ede8d79a353d2ce13044347c3b56ee"
+    },
+    {
+      "path": "docs-site/pages/workspace.md",
+      "mode": "100644",
+      "gitSha": "5a86608664264ac50ab06ca88dceecd30c7a40e0"
+    },
+    {
+      "path": "docs-site/pages/writing.md",
+      "mode": "100644",
+      "gitSha": "8aa9bd9f31f03370d5824cfca1a3e1cbfb8cfe2c"
+    },
+    {
+      "path": "docs/architecture.md",
+      "mode": "100644",
+      "gitSha": "e816ffe0fd22102c2fdbc89993435b5ba5e30e37"
+    },
+    {
+      "path": "docs/proposals/publisher-checks.md",
+      "mode": "100644",
+      "gitSha": "b7862aeead92d7a1a97d47c1f1092fcf6e6d40ca"
+    },
+    {
+      "path": "docs/proposals/publisher-checks.workflow.yml.example",
+      "mode": "100644",
+      "gitSha": "d5688a947d69231e21f3e18e8b6624e9b4797816"
+    },
+    {
+      "path": "docs/proposals/static-publication-checks.md",
+      "mode": "100644",
+      "gitSha": "6bc69d121218c3e74ca1af5b840448f8ebd9d1c4"
+    },
+    {
+      "path": "docs/proposals/static-publication-checks.workflow.yml.example",
+      "mode": "100644",
+      "gitSha": "6bdd0c49734c5c5d6f2c1645abbc2a7744d90ef2"
+    },
+    {
+      "path": "docs/spec.md",
+      "mode": "100644",
+      "gitSha": "d94f606f64c501ee081242b41414e313228062f5"
+    },
+    {
+      "path": "lib/publication.mjs",
+      "mode": "100644",
+      "gitSha": "e11db8a954b3ccecd783ef00b9f957e54ce2139e"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "gitSha": "95ea331e5323e10b0bc5d4f7519c9168e1fbaf0d"
+    },
+    {
+      "path": "tests/cli.test.mjs",
+      "mode": "100644",
+      "gitSha": "9db9c9655a37b2587e9ae19597ecd96d9a7d9f78"
+    },
+    {
+      "path": "tests/markdown.test.mjs",
+      "mode": "100644",
+      "gitSha": "7211459036dcb6d27539197381870dcdf69b88a7"
+    },
+    {
+      "path": "tests/model.test.mjs",
+      "mode": "100644",
+      "gitSha": "d79a537b99d73915765935eac573a8254954e742"
+    },
+    {
+      "path": "tests/publication.test.mjs",
+      "mode": "100644",
+      "gitSha": "3b863ab37d0018322ccb33c429aee019df2c233a"
+    },
+    {
+      "path": "tests/routes.test.mjs",
+      "mode": "100644",
+      "gitSha": "0795179ad0d5f243ae029b3e3990c01786e6e71f"
+    },
+    {
+      "path": "vercel.json",
+      "mode": "100644",
+      "gitSha": "6138fec3e7fcc23635311aa6f58866a56b207ea3"
+    },
+    {
+      "path": "web/app.mjs",
+      "mode": "100644",
+      "gitSha": "82fa669e9ee486e432a7e67ffc8411546890eeee"
+    },
+    {
+      "path": "web/favicon.svg",
+      "mode": "100644",
+      "gitSha": "928162d74330452cc53c81abca648a0e7f077c32"
+    },
+    {
+      "path": "web/index.html",
+      "mode": "100644",
+      "gitSha": "70e1f2d1bf22b819bafbff199dc552cb21df05b4"
+    },
+    {
+      "path": "web/lib/markdown.mjs",
+      "mode": "100644",
+      "gitSha": "d28c7709bbb04b561b2aa3e5a490033239de7f9d"
+    },
+    {
+      "path": "web/lib/model.mjs",
+      "mode": "100644",
+      "gitSha": "d1b62e22250f8c8cc51d8c7dae035e75a00344ad"
+    },
+    {
+      "path": "web/lib/routes.mjs",
+      "mode": "100644",
+      "gitSha": "72f4604e97d9cfb04ef1f672ae2a3eb1086c260a"
+    },
+    {
+      "path": "web/styles.css",
+      "mode": "100644",
+      "gitSha": "34dd5cab02d69913ecc0622d13793f016e8ecce7"
+    }
+  ],
+  "testFiles": [
+    {
+      "path": "tests/cli.test.mjs",
+      "names": [
+        "T2 CLI init creates a real Markdown project and declared files",
+        "T2 CLI check validates a Markdown directory without changing it",
+        "T2 CLI build emits actual assets, exact sources and a verified hash manifest",
+        "T2 CLI build accepts an exported project bundle and preserves source bytes",
+        "T2 CLI init refuses an existing destination and preserves its tree",
+        "T2 CLI build refuses an existing destination and preserves input and output",
+        "T2 CLI refuses symlink project directory and bundle inputs before output",
+        "T2 CLI refuses nested declared-page traversal before output and preserves its owned sibling",
+        "T2 CLI refuses symlinked Markdown files and nested Markdown directories",
+        "T2 CLI rejects duplicate declared files and duplicate page slugs before output",
+        "T2 CLI refuses malformed UTF-8 in Markdown and exported bundles",
+        "T2 CLI refuses individual-page and aggregate Markdown byte-budget overflow",
+        "T2 CLI rejects missing pages, same-page and cross-page headings, and dangerous links before output",
+        "T2 CLI argument errors have a failing exit status and perform no writes"
+      ]
+    },
+    {
+      "path": "tests/markdown.test.mjs",
+      "names": [
+        "HTML escaping protects text and both attribute quote styles",
+        "headings expose deterministic namespaced unique Unicode anchors and plain labels",
+        "paragraphs blockquotes and horizontal rules render a closed block vocabulary",
+        "ordered and unordered lists preserve item order with escaped item text",
+        "fenced code escapes source and language while assigning copy controls to code blocks",
+        "inline code strong emphasis and escaped punctuation retain searchable text",
+        "external HTTP HTTPS and mailto links use validated URLs and safe attributes",
+        "relative known Markdown pages and local fragments resolve from the current directory",
+        "missing internal pages remain escaped labels with an actionable warning",
+        "dangerous malformed and escaping link destinations never become anchors",
+        "raw HTML MDX scripts and event-bearing tags remain source text",
+        "image syntax produces only its label and never loads local or remote resources",
+        "simple tables escape cells preserve reading order and warn on uneven rows",
+        "renderer metadata and collections are detached frozen values",
+        "renderer limits warnings and rejects invalid Unicode oversized content and accessor options",
+        "unclosed code and malformed inline syntax remain deterministic escaped data",
+        "resolved link metadata binds page fragments without retaining source destinations",
+        "heading allocation is bounded and never collides with reader DOM identities"
+      ]
+    },
+    {
+      "path": "tests/model.test.mjs",
+      "names": [
+        "project normalization supplies exact defaults and detaches frozen data",
+        "project normalization accepts data-only null-prototype records and preserves page order",
+        "project normalization rejects non-record roots and unsupported or missing schemas",
+        "project normalization rejects extra hidden symbol and accessor root fields without reading getters",
+        "project pages reject inherited unknown hidden symbol and accessor fields",
+        "project page arrays must be dense bounded data without getters or extra fields",
+        "project names and titles enforce nonblank single-line character boundaries",
+        "project descriptions and groups retain defaults but reject invalid explicit values",
+        "project accents accept only six hexadecimal digits and normalize case",
+        "slugs retain lowercase nested identities and page hrefs encode their path as query data",
+        "slugs reject traversal reserved runtime paths ambiguous encodings and excessive depth",
+        "projects reject duplicate slug identities and absent required page fields",
+        "projects preserve valid Unicode but reject NUL and isolated surrogate code units",
+        "project page limits count UTF-8 bytes and accept the inclusive byte boundary",
+        "project aggregate content has an inclusive four MiB byte budget",
+        "canonical pretty JSON stays within the five MiB browser import budget after escaping"
+      ]
+    },
+    {
+      "path": "tests/publication.test.mjs",
+      "names": [
+        "site URLs normalize explicit HTTPS origins and plain nested bases with trailing slashes",
+        "site URLs reject implicit hosts credentials ambiguity and raw or encoded traversal",
+        "publication preparation returns detached deeply frozen rendered data and byte counters",
+        "publication preparation rejects Markdown warnings before producing a usable publication",
+        "publication preparation validates same-page and cross-page namespaced heading targets",
+        "static publication emits actual first and nested articles without waiting for JavaScript",
+        "static asset and page references remain relative at every pretty-path depth",
+        "static pages contain grouped navigation contents neighbours and semantic IDs exactly once",
+        "static publication escapes metadata navigation labels and arbitrary source HTML",
+        "only renderer-owned internal page hrefs are rewritten while anchors external links and code stay data",
+        "canonical and Open Graph URLs use explicit site configuration and first-page pretty identity",
+        "sitemap and robots list only configured page identities and exclude the noindex recovery page",
+        "404 output offers declared navigation and is noindex without an invented canonical",
+        "unconfigured publication creates no guessed host canonical sitemap or robots files",
+        "static publication rejects missing duplicated overlapping or miswired trusted template markers",
+        "publication preserves placeholder-shaped user data and rejects option getters and unsafe identities"
+      ]
+    },
+    {
+      "path": "tests/routes.test.mjs",
+      "names": [
+        "page paths retain safe nested slug identities without a leading root",
+        "page URLs stay under explicit root or nested bases and emit canonical trailing slashes",
+        "route parsing recognizes root pretty index and slashless paths as frozen values",
+        "legacy page queries accept recognized in-base shapes and reject duplicates or invalid identity",
+        "route parsing refuses external origins credentials and paths outside the declared base",
+        "route parsing rejects traversal escaped paths ambiguous separators dots and invalid Unicode",
+        "decoded Unicode fragments round trip exactly while malformed UTF-8 and controls are refused",
+        "routing rejects invalid types and unsafe bases without coercing arbitrary objects"
+      ]
+    }
+  ],
+  "selectedByteHashes": [
+    {
+      "path": "bin/clero.mjs",
+      "bytes": 12038,
+      "sha256": "e4ac3b9ab5b1d5099de4cf9c16c8d3cb202f22469df34f8c5421f16ec4dff35d"
+    },
+    {
+      "path": "docs/proposals/publisher-checks.workflow.yml.example",
+      "bytes": 9940,
+      "sha256": "7aedf50c0ea0179519e340e030d7425a99be1337bb835e42dab31c418fe2a9cc"
+    },
+    {
+      "path": "docs/proposals/static-publication-checks.workflow.yml.example",
+      "bytes": 10649,
+      "sha256": "cbac9202849eb4f5e63367db21b371aeb952ca862cf629e789bf692aaf4db6d5"
+    },
+    {
+      "path": "lib/publication.mjs",
+      "bytes": 10894,
+      "sha256": "3690f37017b74a3ac27ea8f5c13301adde1288c9ba58ef74cea3185316c871b3"
+    },
+    {
+      "path": "tests/cli.test.mjs",
+      "bytes": 17083,
+      "sha256": "fcd278d45690d5b66ff2d7286819cfba7765d766456bd50cbda249c17a95cc51"
+    },
+    {
+      "path": "tests/markdown.test.mjs",
+      "bytes": 10607,
+      "sha256": "53773460d5eda1b6e6c9f8b8a39edd48a8b6fc9c2bd2f0965a526d5322cfba98"
+    },
+    {
+      "path": "tests/model.test.mjs",
+      "bytes": 9765,
+      "sha256": "21b2dfdf60f71222a03f3f75e5943750800efdf3250a661eb70d77e03b7d6592"
+    },
+    {
+      "path": "tests/publication.test.mjs",
+      "bytes": 14445,
+      "sha256": "76ba06bced561ca936af16cb2b627976c801e4eaed9fa6ea9b587fa589d32135"
+    },
+    {
+      "path": "tests/routes.test.mjs",
+      "bytes": 6104,
+      "sha256": "6025de80edafeab9c2d4f48fbe45364c98e1847c8fe166cdd4f739e469dd2389"
+    },
+    {
+      "path": "web/app.mjs",
+      "bytes": 31973,
+      "sha256": "4d7b05cab795b523d4ae83252e5a5cc112850f48d3c72f47c2b778c11ed80609"
+    },
+    {
+      "path": "web/lib/markdown.mjs",
+      "bytes": 12117,
+      "sha256": "9d4fe505c6c5548124f5cb0677baadaeb3723ebf0c76c85b1d420642bb50fb23"
+    },
+    {
+      "path": "web/lib/model.mjs",
+      "bytes": 4982,
+      "sha256": "f1a1e07dd4d1ea0845fbac4550b8b09b6a377393b1b01d5ef117e10451608568"
+    },
+    {
+      "path": "web/lib/routes.mjs",
+      "bytes": 3145,
+      "sha256": "756292d2eb99774381d40d36f2d2374f84c7eae18063cde86d5aba463ec1b9d7"
+    }
+  ],
+  "staticChecks": {
+    "modules": 11,
+    "imports": 14,
+    "parser": "5.9.3",
+    "caseNames": 72
+  },
+  "totals": {
+    "model": 16,
+    "markdown": 18,
+    "routes": 8,
+    "publication": 16,
+    "cli": 14,
+    "total": 72
+  },
+  "runtimeInputsUnchanged": 11,
+  "limits": [
+    "Original source6f28d77 produced71passes1false-positive assertion in two sequential runs; no original all-pass claim.",
+    "Corrected assertion distinguishes actual attributes from quoted values and retains positive escaping checks plus real event/style controls.",
+    "No local build/product imports/test execution/install; browser and hosted product acceptance remain separate.",
+    "Source seal excludes only results, not failed guards or application inputs."
+  ]
+}

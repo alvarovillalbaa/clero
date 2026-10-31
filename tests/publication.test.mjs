@@ -17,6 +17,9 @@ const project = (overrides = {}) => ({
   ], ...overrides,
 });
 const files = result => new Map(result.files);
+// Inspect attributes in the publisher's closed HTML grammar, excluding quoted values.
+const forbiddenAttributes = html => (html.match(/<[a-z][a-z0-9:-]*(?:[^"'<>]|"[^"]*"|'[^']*')*>/gi) ?? [])
+  .some(tag => /\s(?:on[a-z0-9_-]+|style)\s*=/i.test(tag.replace(/"[^"]*"|'[^']*'/g, '""')));
 
 test('site URLs normalize explicit HTTPS origins and plain nested bases with trailing slashes', () => {
   assert.equal(normalizeSiteUrl(undefined), null);
@@ -93,8 +96,10 @@ test('static publication escapes metadata navigation labels and arbitrary source
   assert.ok(html.includes('&lt;img src=x onerror=run()&gt;'));
   assert.ok(html.includes('&lt;script&gt;source()&lt;/script&gt;'));
   assert.ok(!html.includes('<script>source()'));
-  assert.ok(!/<[^>]+\son(?:click|error|load)=/i.test(html));
-  assert.ok(!/<[^>]+\sstyle=/i.test(html));
+  assert.equal(forbiddenAttributes(html), false);
+  for (const tag of ['<div onclick="run()">', "<svg onload='run()'>", '<img ONERROR=run()>', '<p style="color:red">', '<p STYLE=color:red>']) {
+    assert.equal(forbiddenAttributes(tag), true, `Real executable attribute must remain rejected: ${tag}`);
+  }
 });
 
 test('only renderer-owned internal page hrefs are rewritten while anchors external links and code stay data', () => {

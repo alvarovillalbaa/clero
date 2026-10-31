@@ -1,7 +1,9 @@
 # Static publication checks
 
-31 October 2026. Authored and **UNRUN**. This proposal requires explicit
-execution approval under the supplied AGENTS.md sections 7 and 14.
+31 October 2026. Alvaro approved this 72-case temporary-CI scope with
+“I approve. You choose.” See the [execution receipt](../results/2026/10-31/static-publication-checks.md)
+for actual attempts and the same-scope assertion repair. Browser execution is
+outside this approval.
 
 ## Source and proposed execution
 
@@ -25,7 +27,8 @@ These include the 48 named regression cases from the initial publisher scope,
 with model filename-boundary and CLI output assertions adapted, plus 24 new routing/publication cases.
 The original unanswered 48-case question remains bound to immutable source
 `79813554c1449d6c48775fbd3d65626a45634f7b`. It does not authorize this expanded
-source or replace this new approval. None of either scope has run.
+source or replace this new approval. The original 48-case source was not run
+separately; its named regression cases are included in the approved 72-case run.
 
 One temporary public `ubuntu-24.04` GitHub Actions job, capped at five minutes,
 uses pinned official checkout/setup-node Actions and Node 24.21.0. There is no
@@ -47,7 +50,7 @@ The Node per-test flag is an additional ceiling, not the total deadline.
 
 ## Source and fixture ownership
 
-[The source seal](../results/2026/10-31/static-publication-source.json) lists every
+[The repaired source seal](../results/2026/10-31/static-publication-checks-source.json) lists every
 tracked source path/mode/blob except results, exact case names and selected
 byte hashes. The controller verifies its own manifest bytes against the pinned
 Git object and all source/index/working bytes before and after outcomes. It

@@ -44,7 +44,10 @@ claimed safe by reputation. Input parent directory aliases resolve normally.
 
 Hosted team workspaces, Git sync, API tooling, richer Markdown/components, AI,
 analytics and full reference-product parity remain separate unfinished work.
-New domain/CLI and browser checks require their supplied explicit approvals;
-no authored case has been run during source preparation. The initial 48-check
-proposal stays pinned to its original source; the static-publication increment
-has a separate proposed scope and source seal.
+Domain/CLI and browser checks follow the supplied explicit approval rules.
+The current 72-case domain/CLI scope is approved. Its first run passed 71 cases
+and exposed a false-positive HTML-attribute assertion; the correction retains
+the same case names and adds real executable-attribute controls. See the
+[execution receipt](docs/results/2026/10-31/static-publication-checks.md).
+The initial 48-check proposal remains tied to its original source. Browser
+acceptance remains separate and unverified.

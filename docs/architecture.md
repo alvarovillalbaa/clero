@@ -61,7 +61,10 @@ the CLI on it to create `public/`; it installs no packages. That necessary hoste
 build is separate from authored domain/filesystem cases. The initial 48-check
 scope remains pinned to its original source. Static publication adds separately
 proposed routing/publication cases and adapts the model boundary and CLI output assertions.
-All authored tests and browser acceptance remain approval-gated and unrun.
+The 72-case domain/CLI scope is now approved; its first run passed 71 cases and
+exposed a false-positive assertion that is corrected without changing product
+HTML. [Execution evidence](results/2026/10-31/static-publication-checks.md) records
+the exact tested sources. Browser acceptance remains separately unverified.
 
 ## Boundaries
 
