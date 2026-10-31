@@ -33,7 +33,8 @@ disabled or made optional.
 
 The [new source seal](static-publication-checks-source.json) binds the corrected
 test, the improved inactive controller, documentation and unchanged product
-inputs. The exact same 72-case run is being completed on that repaired source.
+inputs. The exact same 72-case run completed on repaired source
+`7c9648d34954d0fb0eda712b33f10b2c14230d4b`.
 All attempts are sequential executions of the single temporary workflow job;
 there is no broader suite, installation, server, browser, database, account,
 model/provider call or paid enrollment. Each test process is capped at 120
@@ -41,7 +42,29 @@ seconds. The final retry's runner ceiling is reduced to four minutes to keep
 the observed initial 10-second and diagnostic 22-second jobs plus that ceiling
 inside the approved five-minute aggregate runner budget.
 
-This receipt is in progress until the final source/run and cleanup are recorded.
-No all-pass result, current-head proof or browser acceptance is claimed yet.
+## Final result and cleanup
+
+[Run 41181319286](https://github.com/alvarovillalbaa/clero/actions/runs/41181319286),
+job `124479128438`, is **successful: 72 tests, 72 passes, zero failure,
+cancellation, skip or TODO**. Its workflow definition is
+`802bbe1b3e0a1a25c856ec6fccb2435477a00c69`; checkout and both source guards bind
+the repaired source above. All 72 observed unique case names match the seal.
+The child exited zero without a signal, timeout or log-cap stop. The fixture
+directory was empty and the exact owned temporary root was removed.
+
+The original and diagnostic jobs took 10 and 22 seconds; the passing job took
+10 seconds. Aggregate active job time is **42 seconds**, inside five minutes.
+The controller's fixture process ceilings and output caps were preserved.
+The temporary workflow is disabled and removed after terminal job readback.
+The final receipt commit changes only results and retires that workflow; all
+34 repaired non-results source inputs remain identical to the passing source.
+See [sanitized machine-readable evidence](static-publication-checks.json).
+
+The result proves this exact domain/renderer/routes/HTML-producer/CLI fixture
+scope, not browser rendering, actual device storage/clipboard, public access,
+indexing or full reference-product/portfolio completion. No browser result is
+claimed. Original source `6f28d77` remains accurately recorded as 71/72 rather
+than relabelled green; the application runtime inputs are unchanged by the fix.
+
 No local product import, authored test execution, fixture build or installation
 occurred; the local Storage Guard failure remains respected.
