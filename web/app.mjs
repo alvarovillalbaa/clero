@@ -277,6 +277,9 @@ function saveWorkspace() {
 function discardWorkspace() {
   const message = published ? "Discard the local working copy and remove Clero's saved workspace on this device? The published documentation and all other browser data will be kept." : "Remove Clero's saved workspace on this device? Published docs are unavailable, so this tab's current working copy and unapplied edits will be retained for export.";
   if (!window.confirm(message)) return;
+  // A file read started before this explicit discard must not reopen that import later.
+  importSequence += 1;
+  $("project-file").value = "";
   try {
     if (localStorage.getItem(WORKSPACE_KEY) !== savedRaw) { error("Another tab changed the saved workspace. Export this working copy and reload before discarding the saved copy."); return; }
     localStorage.removeItem(WORKSPACE_KEY);
