@@ -28,6 +28,9 @@
   Carry those three immutable outcomes; the completion profile runs only C04.
   Preserve the failed receipt and keep the combined runner budget below the
   original twenty-minute ceiling. Do not describe separate attempts as one pass.
+- The C04 completion also failed on a response-body observer/navigation race.
+  Preserve that second receipt; repair durable browser-side observation while
+  retaining every byte assertion. No failed C04 becomes an accepted outcome.
 - Do not claim full Mintlify parity, hosted collaboration, npm publication,
   browser acceptance or production security from a build. Persist proof limits
   and source/check/deployment evidence in docs/results/.

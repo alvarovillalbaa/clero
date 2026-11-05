@@ -9,7 +9,7 @@ const REPOSITORY = 'alvarovillalbaa/clero';
 const BRANCH = 'refs/heads/qa/clero-workspace-20261105';
 const ACTIVE = '.github/workflows/workspace-browser.yml';
 const SPEC = 'scripts/workspace-browser-driver.mjs';
-const SPEC_SHA = '95d6748b7107b53691912bf39dcde6816ed2910439ab3d68304262be8a21bb28';
+const SPEC_SHA = '1623f4ad7907564a9c2b6708c15f96a5804947f9702354d03ed27ff2eb8a4e75';
 const CARRY = 'docs/results/2026/11-05/workspace-browser-attempt-1.json';
 const CARRY_SHA = '0078b1bff44475afdf5d47e03e6095bdeb841e8b212835c8ed091e556e3729dd';
 const ORIGIN = 'https://clero-alvaro.vercel.app';
@@ -426,6 +426,85 @@ function carryAccepted() {
     preAssetObservations: 26, postAssetObservations: 0, acceptedCasesRepeated: 0,
     qualification: 'The first run failed overall. Its three accepted journeys remain historical; only C04 executes now. Search mismatch is source-inferred; the first actual search text was not retained.' };
 }
+function retainSecondFailure() {
+  const receipt = 'docs/results/2026/11-05/workspace-browser-attempt-2.json';
+  const expectedSha = 'ccce2f9eda0a2888a343f4fc9aa14a943944c104d69a1b2a814455fd2022ff9c';
+  const bytes = read(path.join(repo, receipt), 262144);
+  need(bytes.length === 111142 && sha(bytes) === expectedSha, 'second_receipt_identity');
+  const old = JSON.parse(bytes), result = old.browser?.result;
+  need(old.schemaVersion === 'clero.workspace-browser.v1' && old.status === 'failed'
+    && old.sourceCommit === '2c0daff0af7a50cd935ae4f39c98a06c346c074d'
+    && old.expectedDeployment === 'dpl_GXfN3rieN5YHvYTx1pJkiu18axCb'
+    && old.generated?.sourceSha256 === '95d6748b7107b53691912bf39dcde6816ed2910439ab3d68304262be8a21bb28'
+    && old.generated.copiedByteExact === true && old.commands?.length === 29, 'second_source_scope');
+  let verifiedStreams = 0;
+  const browserOutputs = [];
+  for (const command of old.commands) {
+    const isBrowser = command.label === 'browser_cases';
+    need(command.exitCode === (isBrowser ? 1 : 0) && command.signal === null && command.stopReason === null
+      && command.released && command.exitObservedAndReaped && command.closeObserved
+      && command.pipesEOF?.length === 2 && command.pipesEOF.every(value => value === true)
+      && command.originalProcessGroupAbsent === true && !command.forcedDrain && !command.termSent && !command.killSent
+      && command.streams?.length === 2, 'second_command_cleanup');
+    for (const [index, stream] of command.streams.entries()) {
+      const raw = stream.raw, zipped = Buffer.from(raw.data, 'base64');
+      need(stream.name === (index ? 'stderr' : 'stdout') && raw.encoding === 'gzip-base64'
+        && zipped.length === raw.compressedBytes && zipped.length <= 131072, 'second_stream_shape');
+      const decoded = gunzipSync(zipped, { maxOutputLength: STREAM_LIMIT });
+      need(stream.complete && decoded.length === raw.bytes && decoded.length === stream.observedBytes
+        && sha(decoded) === raw.sha256 && sha(decoded) === stream.observedSha256, 'second_stream_identity');
+      verifiedStreams++;
+      if (isBrowser && stream.name === 'stdout') browserOutputs.push(decoded);
+    }
+  }
+  need(verifiedStreams === 58 && browserOutputs.length === 1, 'second_browser_stdout_count');
+  const stdout = browserOutputs[0], lines = stdout.toString().split('\n').filter(line => line.startsWith('CLERO_BROWSER_DRIVER='));
+  need(stdout.length === old.browser.rawBytes && sha(stdout) === old.browser.rawSha256 && lines.length === 1
+    && JSON.stringify(JSON.parse(lines[0].slice('CLERO_BROWSER_DRIVER='.length))) === JSON.stringify(result), 'second_browser_wrapper_identity');
+  need(result.schemaVersion === 1 && result.origin === ORIGIN && result.sourceCommit === old.sourceCommit
+    && result.expectedDeployment === old.expectedDeployment && result.status === 'failed'
+    && JSON.stringify(result.caseIds) === '["C04"]' && result.cases?.length === 1
+    && result.cases[0].id === 'C04' && result.cases[0].title === TITLES[3]
+    && result.cases[0].accepted === false && typeof result.cases[0].error === 'string'
+    && result.errors?.length === 2 && result.boundaries?.responseErrors === 1, 'second_failed_case_scope');
+  for (const key of ['pageErrors', 'consoleErrors', 'unexpectedRequests', 'credentialRequests', 'webSockets', 'requestFailures', 'unexpectedDialogs'])
+    need(result.boundaries?.[key] === 0, 'second_unexpected_boundary');
+  const cleanup = result.cleanup;
+  need(cleanup?.contextsCreated === 2 && cleanup.contextsClosed === 2 && cleanup.browserClosed === true
+    && cleanup.lateChecksComplete === true && cleanup.fixtureCleanup === 'passed' && cleanup.failures?.length === 0
+    && old.processCleanup?.passed === true && old.processCleanup.started === 29 && old.networkCleanup?.passed === true
+    && old.browserProcessCleanup?.passed === true && old.browserProcessCleanup.remaining?.length === 0
+    && old.browserProcessCleanup.termSent === 0 && old.browserProcessCleanup.killSent === 0
+    && old.browserProcessCleanup.scanUncertain === false && old.scratchCleanup === 'passed', 'second_cleanup');
+  need(old.sourceFiles?.length === 50 && old.sourceFiles.reduce((sum, item) => sum + item.bytes, 0) === 507594
+    && new Set(old.sourceFiles.map(item => item.path)).size === 50, 'second_source_vector');
+  const vectorSha = sha(JSON.stringify(old.sourceFiles));
+  need(old.guards?.length === 4 && JSON.stringify(old.guards.map(item => item.label)) === JSON.stringify(['before', 'before_browser', 'after', 'after_cleanup'])
+    && old.guards.every(item => item.passed && item.trackedFiles === 50 && item.sourceBytes === 507594
+      && item.vectorSha256 === vectorSha && item.fullHeadIndexModesAndBytes && item.noUntrackedOrIgnoredOutput), 'second_source_guards');
+  const allowed = new Set(['AGENTS.md', 'docs/proposals/workspace-browser-checks.md', SPEC, 'scripts/workspace-browser-controller.mjs']);
+  const protectedFiles = [], changed = [];
+  for (const expected of old.sourceFiles) {
+    const actual = fileVector(expected.path);
+    need(actual.mode === expected.mode, 'second_source_mode_changed');
+    if (allowed.has(expected.path)) changed.push({ path: expected.path, historicalSha256: expected.sha256, currentSha256: actual.sha256 });
+    else { need(JSON.stringify(actual) === JSON.stringify(expected), 'second_protected_source_changed'); protectedFiles.push(actual); }
+  }
+  need(protectedFiles.length === 46 && changed.length === 4, 'second_source_closure');
+  const payloads = publicationFiles.filter(item => item.path !== 'clero-output.json');
+  need(old.publication?.fileCount === 26 && old.publication.files?.length === 26 && payloads.length === 25
+    && JSON.stringify(payloads) === JSON.stringify(old.publication.files.filter(item => item.path !== 'clero-output.json'))
+    && old.servedAssets?.length === 26 && old.servedAssets.every(item => item.phase === 'before_browser'
+      && item.matchesExpected && item.complete && item.readerReleased)
+    && old.servedAssets.filter(item => item.comparison === 'exact-bytes' && item.byteExact).length === 25
+    && old.servedAssets.filter(item => item.comparison === 'closed-manifest-file-hashes').length === 1, 'second_publication_scope');
+  report.diagnosticAttempts = [{ receipt, bytes: bytes.length, sha256: expectedSha, sourceCommit: old.sourceCommit,
+    runId: 42033242306, jobId: 127264704762, acceptedCases: [], failedCase: 'C04', verifiedStreams,
+    browserStdoutBytes: stdout.length, browserStdoutSha256: sha(stdout), commandCount: 29, sourceGuards: 4,
+    protectedSourceInputs: 46, protectedSourceVectorSha256: sha(JSON.stringify(protectedFiles)), allowedSourceChanges: changed,
+    publicationPayloadsByteExact: 25, preAssetObservations: 26, postAssetObservations: 0,
+    qualification: 'Failed overall on one transient-document body observer error. Its functional observations are diagnostic only; no C04 acceptance is carried.' }];
+}
 function canonicalVariant(route) {
   const result = new Set([route]);
   if (route !== '/' && route.endsWith('/')) result.add(route.slice(0, -1));
@@ -521,7 +600,24 @@ function browserResults(bytes) {
   const c = value.cleanup;
   need(c && c.contextsCreated === 2 && c.contextsClosed === 2 && c.browserClosed === true
     && c.fixtureCleanup === 'passed' && c.lateChecksComplete === true
+    && c.cdpSessionsCreated === 1 && c.cdpSessionsDetached === 1 && c.cdpSessionsRemaining === 0
+    && c.cdpPendingResponses === 0 && Array.isArray(c.cdpFailures) && c.cdpFailures.length === 0
     && Array.isArray(c.failures) && c.failures.length === 0, 'browser_resource_cleanup');
+  const observer = value.projectObserver, project = publicationFiles.find(item => item.path === 'project.json');
+  need(observer?.kind === 'chromium-durable-network' && observer.maxTotalBufferBytes === 8388608
+    && observer.maxResourceBufferBytes === 5242880 && Number.isSafeInteger(observer.requests) && observer.requests > 0
+    && observer.requests === observer.responses && observer.requests === observer.completedBodies
+    && Array.isArray(observer.reads) && observer.reads.length === observer.requests && observer.reads.length <= 128, 'browser_project_observer_scope');
+  const documentRoutes = new Set(assetManifest.filter(item => item.path.endsWith('index.html')).flatMap(item => [...canonicalVariant(item.route)]));
+  const ordinals = new Set();
+  for (const read of observer.reads) {
+    need(read.session === 1 && Number.isSafeInteger(read.requestOrdinal) && read.requestOrdinal > 0 && !ordinals.has(read.requestOrdinal)
+      && documentRoutes.has(read.documentRoute) && read.loadingFinished === true && read.matchesExpected === true
+      && read.bytes === project.bytes && read.sha256 === project.sha256, 'browser_project_body_identity');
+    ordinals.add(read.requestOrdinal);
+  }
+  need(observer.reads.some(item => item.documentRoute === '/')
+    && observer.reads.some(item => canonicalVariant('/writing/').has(item.documentRoute)), 'browser_transient_project_body_missing');
   report.browser.accepted = true;
 }
 try {
@@ -533,7 +629,7 @@ try {
   const summary = JSON.parse(built.output[0].toString());
   need(summary.schemaVersion === 'clero.project.v1' && summary.pages === 7 && summary.htmlPages === 9
     && summary.output === published, 'publication_build_shape');
-  report.build = summary; prepareManifest(); carryAccepted();
+  report.build = summary; prepareManifest(); carryAccepted(); retainSecondFailure();
   report.runtime.nodeSha256 = sha(read(process.execPath, 268435456));
   const npm = fs.realpathSync(path.join(path.dirname(process.execPath), 'npm'));
   need(fs.statSync(npm).isFile(), 'npm_cli_missing'); report.runtime.npmCliSha256 = sha(read(npm, 1048576));

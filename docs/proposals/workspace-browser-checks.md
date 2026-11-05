@@ -1,8 +1,8 @@
 # Workspace and published-reader browser checks
 
-**Current status — 5 November 2026: partial; C04-only completion unrun.**
-C01–C03 passed in the first run; C04 failed. The
-[failure/completion record](#initial-failure-and-c04-only-completion) below
+**Current status — 5 November 2026: partial; C04 remains unaccepted.**
+C01–C03 passed in the first run; both C04 attempts failed. The
+[failure/completion record](#second-failure-and-durable-observer-repair) below
 supersedes the original execution plan without claiming one four-case pass.
 
 **Original preparation (then unrun) — 5 November 2026.** This proposal and its
@@ -143,3 +143,27 @@ pre/post assets and cleanup remain required. Its 18-minute job plus the first
 50 seconds totals at most 1130 seconds, below the original 1200-second ceiling:
 900-second work, 90-second cleanup, unchanged install bounds, driver 240/45/2
 inside outer 300. No accepted four-case outcome exists yet.
+
+## Second failure and durable-observer repair
+
+The [second receipt](../results/2026/11-05/workspace-browser-attempt-2.json),
+run `42033242306` / job `127264704762`, failed **13:09:21–13:10:05 UTC**.
+C04 completed exact three-slug search/native Enter, legacy/fragment routing,
+native clipboard readback and 390-pixel layout assertions. Its response observer
+then recorded one error: Playwright could not retrieve an earlier response body
+after automatic legacy document navigation. Functional observations do not
+override that failure. All 58 streams, four full guards, 26 preflight assets,
+two contexts/eight owned processes and scratch cleanup passed; no postflight
+asset check is claimed.
+
+The repair prepares an owned Chromium CDP session before navigation, with
+bounded durable response-body buffers. The primary [Network protocol](https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/pdl/domains/Network.pdl)
+and [Playwright CDP API](https://playwright.dev/docs/api/class-browsercontext#browser-context-new-cdp-session)
+describe that mechanism; actual compatibility remains to be observed. All body
+SHA comparisons, including transient legacy responses, remain required. No
+mock, navigation timing gate or ignored observer error is introduced.
+
+Only C04 will execute; C01–C03 retain first-run evidence. Both failed receipts
+remain immutable. The 94 seconds used plus another 18-minute ceiling totals
+1174 seconds, below the original 1200; work 900 s, cleanup 90 s and driver/install
+bounds remain unchanged. No accepted combined outcome exists yet.

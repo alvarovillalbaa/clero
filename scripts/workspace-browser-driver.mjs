@@ -27,7 +27,10 @@ const report = { schemaVersion: 1, origin: process.env.CLERO_CHECK_ORIGIN ?? nul
   cases: TITLES.map((title, index) => ({ id: `C0${index + 1}`, title, accepted: false, error: 'unrun', observations: {} })).filter(item => selectedIds.includes(item.id)), errors: [],
   boundaries: { pageErrors: 0, consoleErrors: 0, unexpectedRequests: 0, credentialRequests: 0, webSockets: 0,
     requestFailures: 0, responseErrors: 0, unexpectedDialogs: 0, expectedPrivate404: 0, events: [] },
-  cleanup: { contextsCreated: 0, contextsClosed: 0, browserClosed: false, lateChecksComplete: false, fixtureCleanup: 'unverified', failures: [] },
+  cleanup: { contextsCreated: 0, contextsClosed: 0, browserClosed: false, lateChecksComplete: false, fixtureCleanup: 'unverified', failures: [],
+    cdpSessionsCreated: 0, cdpSessionsDetached: 0, cdpSessionsRemaining: 0, cdpPendingResponses: 0, cdpFailures: [] },
+  projectObserver: { kind: 'chromium-durable-network', maxTotalBufferBytes: 8 * 1024 * 1024, maxResourceBufferBytes: FILE_LIMIT,
+    requests: 0, responses: 0, completedBodies: 0, reads: [] },
   limits: { workSeconds: 240, cleanupSeconds: 45, stdoutSeconds: 2, fileBytes: FILE_LIMIT, reportBytes: 131072 },
   proofLimits: [CASE_IDS === 'C04' ? 'Only C04 is executed, with two fresh narrow contexts including one real JavaScript-disabled reader. No carried acceptance or physical-device claim.' : 'Four authored Chromium journeys; five fresh contexts including one real JavaScript-disabled narrow reader. No physical-device claim.',
     'Projects enter through actual file selection; downloads, native storage, confirmations and clipboard or its visible fallback are observed without API replacements.',
@@ -36,7 +39,7 @@ const report = { schemaVersion: 1, origin: process.env.CLERO_CHECK_ORIGIN ?? nul
     'Browser.close and settled driver operations are recorded here; the outer controller independently verifies owned process absence before removing its scratch.'] };
 let origin, owned, ownedIdentity, parent, marker, published, browser, current, stage = 'preflight', cleanupEnd;
 let interrupted = false, expired = false, counter = 0;
-const contexts = [], jobs = new Set(), files = new Map(), expectedDialogs = new Map(), pageRecords = new WeakMap();
+const contexts = [], observers = [], jobs = new Set(), files = new Map(), expectedDialogs = new Map(), pageRecords = new WeakMap();
 const signals = new Map();
 function boundary(kind, detail) {
   report.boundaries[kind]++;
@@ -125,10 +128,58 @@ async function withDialog(page, action, { accept = true, type = 'confirm', prefi
   try { const [, result] = await Promise.all([within(() => observed, 10000, 'native ' + type), within(action, 15000, 'dialog action')]); return result; }
   finally { expectedDialogs.delete(page); }
 }
+async function attachProjectObserver(state, page) {
+  await within(async () => {
+    const session = await state.context.newCDPSession(page), record = pageRecords.get(page);
+    const observer = { session, ordinal: observers.length + 1, pending: new Map(), detached: false, listeners: [] };
+    observers.push(observer); report.cleanup.cdpSessionsCreated++;
+    const listen = (name, handler) => {
+      const guarded = event => { try { handler(event); } catch (error) { boundary('responseErrors', error.message); } };
+      observer.listeners.push([name, guarded]); session.on(name, guarded);
+    };
+    listen('Network.requestWillBeSent', event => {
+      if (event.request.url !== origin + '/project.json') return;
+      assert(event.request.method === 'GET' && !observer.pending.has(event.requestId), 'unexpected project request identity');
+      assert(report.projectObserver.requests < 64, 'project response inventory bound');
+      const document = new URL(event.documentURL); assert.equal(document.origin, origin);
+      observer.pending.set(event.requestId, { session: observer.ordinal, requestOrdinal: ++report.projectObserver.requests,
+        documentRoute: document.pathname, responseReceived: false, loadingFinished: false });
+    });
+    listen('Network.responseReceived', event => {
+      const row = observer.pending.get(event.requestId);
+      if (!row && event.response.url !== origin + '/project.json') return;
+      assert(row && !row.responseReceived, 'uncorrelated project response');
+      assert.equal(event.response.url, origin + '/project.json'); assert.equal(event.response.status, 200);
+      row.responseReceived = true; report.projectObserver.responses++;
+    });
+    listen('Network.loadingFailed', event => {
+      if (observer.pending.has(event.requestId)) boundary('responseErrors', 'durable project response loading failed');
+    });
+    listen('Network.loadingFinished', event => {
+      const row = observer.pending.get(event.requestId); if (!row) return;
+      assert(row.responseReceived && !row.loadingFinished, 'project response completion identity'); row.loadingFinished = true;
+      void track(async () => {
+        const body = await within(() => session.send('Network.getResponseBody', { requestId: event.requestId }), 10000, 'durable published project body');
+        assert(typeof body.body === 'string' && typeof body.base64Encoded === 'boolean', 'durable body result shape');
+        assert(body.body.length <= Math.ceil(FILE_LIMIT / 3) * 4, 'durable encoded body bound');
+        const bytes = Buffer.from(body.body, body.base64Encoded ? 'base64' : 'utf8'); assert(bytes.length <= FILE_LIMIT, 'published project body bound');
+        const proof = { session: row.session, requestOrdinal: row.requestOrdinal, documentRoute: row.documentRoute, loadingFinished: true,
+          bytes: bytes.length, sha256: sha(bytes), matchesExpected: bytes.equals(publishedBytes) };
+        assert(proof.matchesExpected, 'published project bytes differ');
+        record.projectReads.push(proof); report.projectObserver.reads.push(proof); report.projectObserver.completedBodies++;
+        observer.pending.delete(event.requestId);
+      }).catch(error => { boundary('responseErrors', error.message); });
+    });
+    // This session is not paused for a debugger. Durable storage keeps the
+    // original response observable across the reader's native document changes.
+    await session.send('Network.enable', { maxTotalBufferSize: report.projectObserver.maxTotalBufferBytes,
+      maxResourceBufferSize: report.projectObserver.maxResourceBufferBytes, enableDurableMessages: true });
+  }, 10000, 'attach durable project observer');
+}
 async function contextFor({ narrow = false, javaScriptEnabled = true } = {}) {
   const context = await within(() => browser.newContext({ viewport: narrow ? { width: 390, height: 844 } : { width: 1440, height: 1000 }, javaScriptEnabled,
     acceptDownloads: true, serviceWorkers: 'block' }), 10000, 'new context');
-  const state = { context, closed: false, expected404: new Set(), expected404Requests: new Set(), expected404Console: new Set() };
+  const state = { context, javaScriptEnabled, closed: false, expected404: new Set(), expected404Requests: new Set(), expected404Console: new Set() };
   contexts.push(state); report.cleanup.contextsCreated++;
   context.setDefaultTimeout(10000); context.setDefaultNavigationTimeout(15000);
   const pages = new Set(['/', '/index.html', ...published.pages.flatMap(page => [`/${page.slug}/`, `/${page.slug}`])]);
@@ -172,19 +223,12 @@ async function contextFor({ narrow = false, javaScriptEnabled = true } = {}) {
         if (expected.accept) await dialog.accept(); else await dialog.dismiss(); expected.resolve(true);
       } catch (error) { expected.reject(error); try { await dialog.dismiss(); } catch {} }
     }).catch(error => { report.errors.push(clean(error.message)); }); });
-    page.on('response', response => {
-      if (new URL(response.url()).pathname !== '/project.json' || response.status() !== 200) return;
-      void track(async () => {
-        const bytes = await within(() => response.body(), 10000, 'read published project');
-        assert(bytes.length <= FILE_LIMIT, 'published project body bound');
-        record.projectReads.push({ bytes: bytes.length, sha256: sha(bytes), matchesExpected: bytes.equals(publishedBytes) });
-      }).catch(error => { boundary('responseErrors', error.message); });
-    });
   });
   return state;
 }
 async function visit(state, route, { private404 = false, javaScript = true } = {}) {
   const page = await within(() => state.context.newPage(), 10000, 'new page');
+  if (state.javaScriptEnabled) await attachProjectObserver(state, page);
   if (private404) { state.expected404.add(route); state.expected404.add(pagePath(route)); }
   const response = await within(() => page.goto(origin + route, { waitUntil: 'load' }), 15000, 'document visit');
   assert.equal(response.status(), private404 ? 404 : 200); documentResponse(response, route); if (javaScript) await interactive(page); return page;
@@ -375,6 +419,16 @@ try {
 } catch (error) { report.errors.push(clean(error.message)); }
 finally {
   cleanupEnd = Math.min(Date.now() + 45000, workEnd + 45000); current = null;
+  const observerEnd = Math.min(Date.now() + 10000, cleanupEnd);
+  while ((jobs.size || observers.some(item => item.pending.size)) && Date.now() < observerEnd) await delay(25);
+  if (jobs.size || observers.some(item => item.pending.size)) report.cleanup.cdpFailures.push('durable project observations did not settle before detach');
+  for (const observer of observers) {
+    try { await within(() => observer.session.detach(), 3000, 'durable observer detach', true); observer.detached = true; report.cleanup.cdpSessionsDetached++; }
+    catch (error) { report.cleanup.cdpFailures.push(clean(error.message)); }
+    finally { for (const [name, handler] of observer.listeners) observer.session.off(name, handler); }
+  }
+  report.cleanup.cdpSessionsRemaining = observers.filter(item => !item.detached).length;
+  report.cleanup.cdpPendingResponses = observers.reduce((sum, item) => sum + item.pending.size, 0);
   for (const state of [...contexts].reverse()) {
     try { await within(() => state.context.close(), 8000, 'context close', true); state.closed = true; report.cleanup.contextsClosed++; }
     catch (error) { report.cleanup.failures.push(clean(error.message)); }
@@ -387,7 +441,8 @@ finally {
   while (jobs.size && Date.now() < settleEnd) await delay(25);
   await new Promise(resolve => setImmediate(resolve)); await new Promise(resolve => setImmediate(resolve));
   report.cleanup.lateChecksComplete = jobs.size === 0;
-  if (owned && report.cleanup.browserClosed && contexts.every(state => state.closed) && jobs.size === 0) {
+  if (owned && report.cleanup.browserClosed && contexts.every(state => state.closed) && jobs.size === 0
+    && report.cleanup.cdpSessionsRemaining === 0 && report.cleanup.cdpPendingResponses === 0 && report.cleanup.cdpFailures.length === 0) {
     try {
       ownedRoot(); assert.deepEqual(fs.readdirSync(owned).sort(), [...files.keys()].map(file => path.basename(file)).sort(), 'unexpected fixture files');
       for (const [file, expected] of files) { const item = fs.lstatSync(file), bytes = readRegular(file); assert(item.dev === expected.dev && item.ino === expected.ino && bytes.length === expected.bytes && sha(bytes) === expected.sha256, 'authored fixture identity changed'); }
@@ -395,9 +450,13 @@ finally {
     } catch (error) { report.cleanup.failures.push(clean(error.message)); }
   }
   if (critical()) report.errors.push('unexpected browser or network error, including late observations');
+  if (report.cleanup.cdpSessionsCreated !== report.cleanup.cdpSessionsDetached || report.cleanup.cdpSessionsRemaining || report.cleanup.cdpPendingResponses || report.cleanup.cdpFailures.length) report.errors.push('durable observer cleanup unverified');
+  const observation = report.projectObserver;
+  if (observation.requests !== observation.responses || observation.requests !== observation.completedBodies || observation.completedBodies !== observation.reads.length) report.errors.push('incomplete published project observations');
   if (interrupted || expired || Date.now() > workEnd + 45000) report.errors.push(interrupted ? 'interrupted' : 'work or cleanup deadline');
   if (report.cleanup.contextsCreated !== report.cleanup.contextsClosed || !report.cleanup.browserClosed || !report.cleanup.lateChecksComplete || report.cleanup.fixtureCleanup !== 'passed' || report.cleanup.failures.length) report.errors.push('resource cleanup unverified');
   if (report.cases.every(item => item.accepted) && (report.cleanup.contextsCreated !== expectedContexts || report.cleanup.contextsClosed !== expectedContexts)) report.errors.push('full context scope not observed');
+  if (report.cases.every(item => item.accepted) && report.cleanup.cdpSessionsCreated !== (CASE_IDS === 'C04' ? 1 : 5)) report.errors.push('full durable observer scope not observed');
   report.status = report.cases.every(item => item.accepted) && report.errors.length === 0 ? 'passed' : 'failed';
   let result = JSON.stringify(report);
   if (Buffer.byteLength(result) > 131072) { report.status = 'failed'; result = JSON.stringify({ schemaVersion: 1, origin: report.origin, cases: report.cases.map(({ id, title }) => ({ id, title, accepted: false, error: 'report limit', observations: {} })), errors: ['report limit'], cleanup: report.cleanup, status: 'failed' }); }
