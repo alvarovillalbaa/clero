@@ -498,4 +498,3 @@ finally {
     process.exitCode = report.status === 'passed' && !interrupted && !globalExpired && Date.now() <= workEnd + 92000 ? 0 : 1;
   });
 }
-
