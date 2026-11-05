@@ -19,6 +19,11 @@
 - Follow the supplied AGENTS.md test gates: authored backend/domain and browser
   checks need their explicit execution approval. Syntax, JSON, import/link and
   whitespace inspection are safe. Run Storage Guard before builds/installs.
+- Alvaro's standing approval and 5 November "Do all the work" continuation
+  authorize the four focused workspace/reader scenarios and one temporary
+  public CI job in docs/proposals/workspace-browser-checks.md, including its
+  isolated browser tooling and publication. The existing 72 domain/CLI checks
+  are closed; do not repeat them without a changed input or concrete concern.
 - Do not claim full Mintlify parity, hosted collaboration, npm publication,
   browser acceptance or production security from a build. Persist proof limits
   and source/check/deployment evidence in docs/results/.
