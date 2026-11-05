@@ -1,6 +1,11 @@
 # Workspace and published-reader browser checks
 
-**Prepared, unrun — 5 November 2026.** This proposal and its
+**Current status — 5 November 2026: partial; C04-only completion unrun.**
+C01–C03 passed in the first run; C04 failed. The
+[failure/completion record](#initial-failure-and-c04-only-completion) below
+supersedes the original execution plan without claiming one four-case pass.
+
+**Original preparation (then unrun) — 5 November 2026.** This proposal and its
 [inactive workflow example](workspace-browser.workflow.yml.example) are source
 preparation, not browser acceptance or an activated CI job. Alvaro's standing
 “I approve everything” / “Do all the work” authorizes this focused packet,
@@ -120,3 +125,21 @@ durability outside the checked reloads, Safari/physical touch, assistive
 technology, hosted synchronization/Auth, provider/model behavior, accounts,
 billing, npm publication and full-product/portfolio acceptance remain open.
 There is no new backend, private corpus, account or paid/model call.
+
+## Initial failure and C04-only completion
+
+The [first receipt](../results/2026/11-05/workspace-browser-attempt-1.json),
+run `42031491247` / job `127258790348`, records C01–C03 passed and C04 failed,
+12:57:20–12:58:10 UTC. Its one-match expectation for “Project reference” ignored
+group-text matching. Source supports three ordered slugs: `configuration`,
+`publishing`, `limits`. The failed DOM status was not captured; this diagnosis
+is source inference until corrected C04 verifies those exact results.
+
+All 58 raw streams, four source guards, 26 preflight assets and owned cleanup
+passed; no first-run postflight-asset check is claimed. Accepted C01–C03 remain
+pinned, not rerun. The unfinished completion runs only C04 in two fresh contexts,
+carrying the first three with immutable source/result checks. Current full
+pre/post assets and cleanup remain required. Its 18-minute job plus the first
+50 seconds totals at most 1130 seconds, below the original 1200-second ceiling:
+900-second work, 90-second cleanup, unchanged install bounds, driver 240/45/2
+inside outer 300. No accepted four-case outcome exists yet.

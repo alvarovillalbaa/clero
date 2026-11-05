@@ -10,6 +10,9 @@ const TITLES = [
   'a stale tab cannot overwrite or discard a newer saved workspace',
   'the narrow published reader supports routing, search, anchors and code copy',
 ];
+const CASE_IDS = process.env.CLERO_CASE_IDS ?? 'C01,C02,C03,C04';
+const selectedIds = CASE_IDS === 'C04' ? ['C04'] : ['C01', 'C02', 'C03', 'C04'];
+const expectedContexts = CASE_IDS === 'C04' ? 2 : 5;
 const KEY = 'clero.workspace.v1', SENTINEL_KEY = 'clero.authored-unrelated', SENTINEL = 'authored-browser-sentinel';
 const FILE_LIMIT = 5 * 1024 * 1024, workEnd = Date.now() + 240000;
 const sha = value => createHash('sha256').update(value).digest('hex');
@@ -20,12 +23,13 @@ const delay = milliseconds => new Promise(resolve => setTimeout(resolve, millise
 const pagePath = value => value === '/' ? '/' : value.replace(/\/$/, '');
 const report = { schemaVersion: 1, origin: process.env.CLERO_CHECK_ORIGIN ?? null, sourceCommit: process.env.SOURCE_COMMIT ?? null,
   expectedDeployment: process.env.CLERO_EXPECTED_DEPLOYMENT ?? null, browserVersion: null, status: 'failed',
-  cases: TITLES.map((title, index) => ({ id: `C0${index + 1}`, title, accepted: false, error: 'unrun', observations: {} })), errors: [],
+  caseIds: selectedIds,
+  cases: TITLES.map((title, index) => ({ id: `C0${index + 1}`, title, accepted: false, error: 'unrun', observations: {} })).filter(item => selectedIds.includes(item.id)), errors: [],
   boundaries: { pageErrors: 0, consoleErrors: 0, unexpectedRequests: 0, credentialRequests: 0, webSockets: 0,
     requestFailures: 0, responseErrors: 0, unexpectedDialogs: 0, expectedPrivate404: 0, events: [] },
   cleanup: { contextsCreated: 0, contextsClosed: 0, browserClosed: false, lateChecksComplete: false, fixtureCleanup: 'unverified', failures: [] },
   limits: { workSeconds: 240, cleanupSeconds: 45, stdoutSeconds: 2, fileBytes: FILE_LIMIT, reportBytes: 131072 },
-  proofLimits: ['Four authored Chromium journeys; five fresh contexts including one real JavaScript-disabled narrow reader. No physical-device claim.',
+  proofLimits: [CASE_IDS === 'C04' ? 'Only C04 is executed, with two fresh narrow contexts including one real JavaScript-disabled reader. No carried acceptance or physical-device claim.' : 'Four authored Chromium journeys; five fresh contexts including one real JavaScript-disabled narrow reader. No physical-device claim.',
     'Projects enter through actual file selection; downloads, native storage, confirmations and clipboard or its visible fallback are observed without API replacements.',
     'Private imported routes may receive the real generated 404 document before the saved local workspace restores; this is not public publication.',
     'No account, upload, backend, provider, model, CLI regression rerun or full Mintlify parity is established.',
@@ -233,7 +237,8 @@ async function imported(page, expected) {
   await value(page, '#edit-project-name', expected.name); assert.equal(await page.locator('#workspace-page-nav button').count(), expected.pages.length);
 }
 async function runCase(index, action) {
-  current = report.cases[index]; mark('setup ' + current.id); const start = Date.now();
+  if (!selectedIds.includes(`C0${index + 1}`)) return;
+  current = report.cases.find(item => item.id === `C0${index + 1}`); mark('setup ' + current.id); const start = Date.now();
   try { Object.assign(current.observations, await action()); assert.equal(critical(), 0, 'unexpected browser/network boundary'); current.accepted = true; current.error = null; }
   catch (error) { current.error = clean(error.message); throw error; }
   finally { current.durationMs = Date.now() - start; }
@@ -244,6 +249,7 @@ for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP']) { signals.set(signal, abor
 const workTimer = setTimeout(() => { expired = true; for (const { context } of contexts) void track(() => context.close()).catch(() => {}); }, Math.max(1, workEnd - Date.now()));
 try {
   assert.equal(process.env.CI, 'true');
+  assert(['C01,C02,C03,C04', 'C04'].includes(CASE_IDS), 'unsupported case selection');
   const url = new URL(report.origin); assert(url.protocol === 'https:' && !url.username && !url.password && url.href === url.origin + '/', 'canonical HTTPS origin required'); origin = url.origin; report.origin = origin;
   parent = fs.realpathSync(process.env.CLERO_CHECK_ROOT ?? ''); assert(path.isAbsolute(parent)); const rootStat = fs.lstatSync(parent); assert(rootStat.isDirectory() && rootStat.uid === process.getuid());
   owned = fs.mkdtempSync(path.join(parent, 'clero-browser-')); fs.chmodSync(owned, 0o700); ownedIdentity = fs.lstatSync(owned); marker = randomUUID();
@@ -338,10 +344,12 @@ try {
     assert.equal(await page.locator('#nav-toggle').getAttribute('aria-expanded'), 'false'); assert.equal(await page.locator('#nav-toggle').evaluate(element => element === document.activeElement), true);
     await click(page, '#open-search'); assert.equal(await page.locator('#search-dialog').evaluate(element => element.open && element.matches(':modal')), true);
     await within(() => page.keyboard.press('Escape'), 5000, 'search Escape'); assert.equal(await page.locator('#open-search').evaluate(element => element === document.activeElement), true);
-    await click(page, '#open-search'); await fill(page, '#search-input', configuration.title); await text(page, '#search-status', '1 matching page.');
+    await click(page, '#open-search'); await fill(page, '#search-input', configuration.title); await text(page, '#search-status', '3 matching pages.');
+    const searchSlugs = await within(() => page.locator('#search-results a').evaluateAll(links => links.map(link => new URL(link.href).pathname.replace(/^\/|\/$/g, ''))), 5000, 'exact ordered search results');
+    assert.deepEqual(searchSlugs, ['configuration', 'publishing', 'limits']);
     await within(() => page.keyboard.press('Tab'), 5000, 'keyboard search result');
-    assert.equal(await page.locator('#search-results a').evaluate(element => element === document.activeElement), true);
-    await documentClick(page, '#search-results a', '/configuration/', true); await text(page, '#page-title', configuration.title);
+    assert.equal(await page.locator('#search-results a').first().evaluate(element => element === document.activeElement), true);
+    await documentClick(page, '#search-results li:first-child a', '/configuration/', true); await text(page, '#page-title', configuration.title);
     mark('legacy route migrates to actual pretty document and heading');
     await within(() => page.goto(origin + '/?page=writing#clero-h-code-people-can-use', { waitUntil: 'domcontentloaded' }), 15000, 'legacy URL visit');
     await within(() => page.waitForURL(url => pagePath(url.pathname) === '/writing' && url.hash === '#clero-h-code-people-can-use', { waitUntil: 'load' }), 15000, 'pretty legacy migration'); await interactive(page);
@@ -362,7 +370,7 @@ try {
     assert.equal(layout.width, 390); assert.equal(layout.height, 844); assert(layout.scrollWidth <= layout.width + 1);
     for (const control of layout.controls) assert(control.x >= 0 && control.right <= 391 && control.width >= 24 && control.height >= 32, 'narrow control bounds');
     return { profile: 'narrow390x844-no-touch-emulation', actualNoJavaScriptReadingAndNavigation: true, prettyDocumentNavigation: true, nativeLegacyMigration: true,
-      headingFragmentObserved: true, nativeSearchModalAndEscapeFocus: true, keyboardSearchResultFocused: true, copy: copied, layout };
+      headingFragmentObserved: true, nativeSearchModalAndEscapeFocus: true, search: { query: configuration.title, orderedSlugs: searchSlugs }, keyboardSearchResultFocused: true, copy: copied, layout };
   });
 } catch (error) { report.errors.push(clean(error.message)); }
 finally {
@@ -389,7 +397,7 @@ finally {
   if (critical()) report.errors.push('unexpected browser or network error, including late observations');
   if (interrupted || expired || Date.now() > workEnd + 45000) report.errors.push(interrupted ? 'interrupted' : 'work or cleanup deadline');
   if (report.cleanup.contextsCreated !== report.cleanup.contextsClosed || !report.cleanup.browserClosed || !report.cleanup.lateChecksComplete || report.cleanup.fixtureCleanup !== 'passed' || report.cleanup.failures.length) report.errors.push('resource cleanup unverified');
-  if (report.cases.every(item => item.accepted) && (report.cleanup.contextsCreated !== 5 || report.cleanup.contextsClosed !== 5)) report.errors.push('full context scope not observed');
+  if (report.cases.every(item => item.accepted) && (report.cleanup.contextsCreated !== expectedContexts || report.cleanup.contextsClosed !== expectedContexts)) report.errors.push('full context scope not observed');
   report.status = report.cases.every(item => item.accepted) && report.errors.length === 0 ? 'passed' : 'failed';
   let result = JSON.stringify(report);
   if (Buffer.byteLength(result) > 131072) { report.status = 'failed'; result = JSON.stringify({ schemaVersion: 1, origin: report.origin, cases: report.cases.map(({ id, title }) => ({ id, title, accepted: false, error: 'report limit', observations: {} })), errors: ['report limit'], cleanup: report.cleanup, status: 'failed' }); }

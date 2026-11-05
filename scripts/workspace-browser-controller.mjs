@@ -4,12 +4,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { gzipSync } from 'node:zlib';
+import { gzipSync, gunzipSync } from 'node:zlib';
 const REPOSITORY = 'alvarovillalbaa/clero';
 const BRANCH = 'refs/heads/qa/clero-workspace-20261105';
 const ACTIVE = '.github/workflows/workspace-browser.yml';
 const SPEC = 'scripts/workspace-browser-driver.mjs';
-const SPEC_SHA = '54c9f6d3eb4505b7a4c4736c92e1e0165eaae429346796987ef988cdebc5ca47';
+const SPEC_SHA = '95d6748b7107b53691912bf39dcde6816ed2910439ab3d68304262be8a21bb28';
+const CARRY = 'docs/results/2026/11-05/workspace-browser-attempt-1.json';
+const CARRY_SHA = '0078b1bff44475afdf5d47e03e6095bdeb841e8b212835c8ed091e556e3729dd';
 const ORIGIN = 'https://clero-alvaro.vercel.app';
 const TITLES = [
   'imports, edits, previews, saves and restores an actual project download',
@@ -55,20 +57,22 @@ const env = {
   CLERO_EXPECTED_DEPLOYMENT: deployment, CLERO_CHECK_ORIGIN: ORIGIN, CLERO_CHECK_ROOT: root,
   CLERO_EXPECTED_PROJECT_JSON: path.join(published, 'project.json'),
   CLERO_PLAYWRIGHT_MODULE: path.join(tools, 'node_modules/playwright/index.mjs'), SOURCE_COMMIT: sourceCommit,
+  CLERO_CASE_IDS: 'C04',
 };
 const report = {
   schemaVersion: 'clero.workspace-browser.v1', sourceCommit, expectedDeployment: deployment, origin: ORIGIN,
   status: 'failed', startedAtUtc: new Date().toISOString(),
   runtime: { node: process.version, platform: process.platform, architecture: process.arch },
-  scope: { scenarios: TITLES, cases: 4, retries: 0, workers: 1, appBuild: 'actual CLI, owned scratch only',
+  scope: { scenarios: [TITLES[3]], cases: 1, carriedCases: ['C01', 'C02', 'C03'], retries: 0, workers: 1, appBuild: 'actual CLI, owned scratch only',
     appDependencies: false, accounts: false, backend: false, models: false, physicalDevice: false,
-    profiles: ['desktop Chromium', 'narrow Chromium', 'narrow JavaScript disabled'], old72CasesRepeated: false },
-  limits: { workSeconds: 1020, cleanupSeconds: 90, browserSeconds: 300, jobMinutes: 20,
+    profiles: ['narrow Chromium', 'narrow JavaScript disabled'], old72CasesRepeated: false, acceptedJourneysRepeated: 0 },
+  limits: { workSeconds: 900, cleanupSeconds: 90, browserSeconds: 300, jobMinutes: 18,
     streamBytes: STREAM_LIMIT, streamGzipBytes: 131072, allStreamsGzipBytes: 524288,
     browserJsonBytes: BROWSER_LIMIT, reportBytes: REPORT_LIMIT, assetFetchSeconds: 8,
     publicationFiles: 512, publicationBytes: 16777216, assetBytes: 5242880, sameOriginCanonicalRedirects: 1 },
   commands: [], guards: [], errors: [], sourceFiles: [],
   proofLimits: [
+    'C01-C03 retain their accepted first-run evidence; only C04 runs now. Combined acceptance is not a single four-pass invocation.',
     'Actual public workspace/reader browser flows are separate from the previously accepted 72 domain/CLI cases, which are not repeated.',
     'The actual source CLI builds a new owned publication in CI; no app dependency, local build or local browser is used.',
     'All emitted payload files are compared with anonymous served responses before/after. The output manifest has a random buildId: only its closed schema and file/path hashes match semantically.',
@@ -79,7 +83,7 @@ const report = {
     'Narrow Chromium and observed clipboard/storage/download behavior do not establish physical devices, hosted collaboration, npm publication or full reference-product parity.',
   ],
 };
-const workEnd = Date.now() + 1020000;
+const workEnd = Date.now() + 900000;
 let cleanupEnd, interrupted = false, globalExpired = false, baseline, allGzip = 0, browserAttempted = false, assetManifest;
 let browserScanUncertain = false, lastBrowserScan = 0;
 const browserProcesses = new Map();
@@ -337,6 +341,91 @@ function verifyPublication(label) {
   need(JSON.stringify(publicationVector()) === JSON.stringify(publicationFiles), 'owned_publication_changed');
   report.publication.guards ??= []; report.publication.guards.push({ label, passed: true });
 }
+function carryAccepted() {
+  const bytes = read(path.join(repo, CARRY), 262144);
+  need(bytes.length === 110992 && sha(bytes) === CARRY_SHA, 'carry_receipt_identity');
+  const old = JSON.parse(bytes);
+  need(old.schemaVersion === 'clero.workspace-browser.v1' && old.status === 'failed'
+    && old.sourceCommit === '07c30a1ee97194c196ae96618968f3e4fa19fc29'
+    && old.expectedDeployment === 'dpl_Ee8HJUqZ6L4jKM8QHxsrn2JhkkUu'
+    && old.generated?.sourceSha256 === '54c9f6d3eb4505b7a4c4736c92e1e0165eaae429346796987ef988cdebc5ca47'
+    && old.generated.copiedByteExact === true && old.commands?.length === 29, 'carry_source_scope');
+  let verifiedStreams = 0;
+  const browserOutputs = [];
+  for (const command of old.commands) {
+    const isBrowser = command.label === 'browser_cases';
+    need(command.exitCode === (isBrowser ? 1 : 0) && command.signal === null && command.stopReason === null
+      && command.released && command.exitObservedAndReaped && command.closeObserved
+      && command.pipesEOF?.length === 2 && command.pipesEOF.every(value => value === true)
+      && command.originalProcessGroupAbsent === true && !command.forcedDrain && !command.termSent && !command.killSent
+      && command.streams?.length === 2, 'carry_command_cleanup');
+    for (const [index, stream] of command.streams.entries()) {
+      const raw = stream.raw, zipped = Buffer.from(raw.data, 'base64');
+      need(stream.name === (index ? 'stderr' : 'stdout') && raw.encoding === 'gzip-base64'
+        && zipped.length === raw.compressedBytes && zipped.length <= 131072, 'carry_stream_shape');
+      const decoded = gunzipSync(zipped, { maxOutputLength: STREAM_LIMIT });
+      need(stream.complete && decoded.length === raw.bytes && decoded.length === stream.observedBytes
+        && sha(decoded) === raw.sha256 && sha(decoded) === stream.observedSha256, 'carry_stream_identity');
+      verifiedStreams++;
+      if (isBrowser && stream.name === 'stdout') browserOutputs.push(decoded);
+    }
+  }
+  need(verifiedStreams === 58 && browserOutputs.length === 1, 'carry_browser_stdout_count');
+  const browserBytes = browserOutputs[0], result = old.browser?.result;
+  need(browserBytes.length === old.browser.rawBytes && sha(browserBytes) === old.browser.rawSha256, 'carry_browser_raw_identity');
+  const lines = browserBytes.toString().split('\n').filter(line => line.startsWith('CLERO_BROWSER_DRIVER='));
+  need(lines.length === 1 && JSON.stringify(JSON.parse(lines[0].slice('CLERO_BROWSER_DRIVER='.length))) === JSON.stringify(result), 'carry_browser_wrapper_identity');
+  need(result.schemaVersion === 1 && result.origin === ORIGIN && result.sourceCommit === old.sourceCommit
+    && result.expectedDeployment === old.expectedDeployment && result.status === 'failed'
+    && result.errors?.length === 1 && result.cases?.length === 4, 'carry_browser_scope');
+  for (const [index, item] of result.cases.entries()) {
+    need(item.id === `C0${index + 1}` && item.title === TITLES[index]
+      && item.accepted === (index < 3) && (index < 3 ? item.error === null : typeof item.error === 'string' && item.error.length > 0), 'carry_case_identity');
+  }
+  for (const key of ['pageErrors', 'consoleErrors', 'unexpectedRequests', 'credentialRequests', 'webSockets', 'requestFailures', 'responseErrors', 'unexpectedDialogs'])
+    need(result.boundaries?.[key] === 0, 'carry_browser_boundary');
+  const cleanup = result.cleanup;
+  need(cleanup?.contextsCreated === 5 && cleanup.contextsClosed === 5 && cleanup.browserClosed === true
+    && cleanup.lateChecksComplete === true && cleanup.fixtureCleanup === 'passed' && cleanup.failures?.length === 0
+    && old.processCleanup?.passed === true && old.processCleanup.started === 29 && old.networkCleanup?.passed === true
+    && old.browserProcessCleanup?.passed === true && old.browserProcessCleanup.remaining?.length === 0
+    && old.browserProcessCleanup.termSent === 0 && old.browserProcessCleanup.killSent === 0
+    && old.browserProcessCleanup.scanUncertain === false && old.scratchCleanup === 'passed', 'carry_cleanup');
+  need(old.sourceFiles?.length === 49 && old.sourceFiles.reduce((sum, item) => sum + item.bytes, 0) === 385821
+    && new Set(old.sourceFiles.map(item => item.path)).size === 49, 'carry_source_vector');
+  const oldVectorSha = sha(JSON.stringify(old.sourceFiles));
+  need(old.guards?.length === 4 && JSON.stringify(old.guards.map(item => item.label)) === JSON.stringify(['before', 'before_browser', 'after', 'after_cleanup'])
+    && old.guards.every(item => item.passed && item.trackedFiles === 49 && item.sourceBytes === 385821
+      && item.vectorSha256 === oldVectorSha && item.fullHeadIndexModesAndBytes && item.noUntrackedOrIgnoredOutput), 'carry_source_guards');
+  const allowed = new Set(['AGENTS.md', 'docs/proposals/workspace-browser-checks.md', SPEC, 'scripts/workspace-browser-controller.mjs']);
+  const protectedFiles = [], changed = [];
+  for (const expected of old.sourceFiles) {
+    const actual = fileVector(expected.path);
+    need(actual.mode === expected.mode, 'carry_source_mode_changed');
+    if (allowed.has(expected.path)) changed.push({ path: expected.path, historicalSha256: expected.sha256, currentSha256: actual.sha256 });
+    else { need(JSON.stringify(actual) === JSON.stringify(expected), 'carry_protected_source_changed'); protectedFiles.push(actual); }
+  }
+  need(protectedFiles.length === 45 && changed.length === 4, 'carry_source_closure');
+  const driver = read(path.join(repo, SPEC), 131072).toString();
+  const start = driver.indexOf('  await runCase(0,'), end = driver.indexOf('  await runCase(3,');
+  need(start >= 0 && end > start && sha(driver.slice(start, end)) === 'f194c298a966218840eed53f8c69d47247af431f3f5ea54ed34a885399f2b1b8', 'carry_case_bodies_changed');
+  const payloads = publicationFiles.filter(item => item.path !== 'clero-output.json');
+  need(old.publication?.fileCount === 26 && old.publication.files?.length === 26 && payloads.length === 25
+    && JSON.stringify(payloads) === JSON.stringify(old.publication.files.filter(item => item.path !== 'clero-output.json')), 'carry_publication_payloads');
+  need(old.servedAssets?.length === 26 && old.servedAssets.every(item => item.phase === 'before_browser'
+    && item.matchesExpected && item.complete && item.readerReleased)
+    && old.servedAssets.filter(item => item.comparison === 'exact-bytes' && item.byteExact).length === 25
+    && old.servedAssets.filter(item => item.comparison === 'closed-manifest-file-hashes').length === 1, 'carry_pre_asset_scope');
+  report.carriedEvidence = { receipt: CARRY, bytes: bytes.length, sha256: CARRY_SHA,
+    sourceCommit: old.sourceCommit, runId: 42031491247, jobId: 127258790348,
+    acceptedCases: result.cases.slice(0, 3).map(({ id, title }) => ({ id, title, accepted: true })),
+    failedCase: { id: 'C04', error: result.cases[3].error, actualSearchTextCaptured: false },
+    verifiedStreams, commandCount: 29, sourceGuards: 4, protectedSourceInputs: 45,
+    protectedSourceVectorSha256: sha(JSON.stringify(protectedFiles)), allowedSourceChanges: changed,
+    publicationPayloadsByteExact: 25, manifestComparison: 'Closed file paths and hashes; random buildId is not byte-compared.',
+    preAssetObservations: 26, postAssetObservations: 0, acceptedCasesRepeated: 0,
+    qualification: 'The first run failed overall. Its three accepted journeys remain historical; only C04 executes now. Search mismatch is source-inferred; the first actual search text was not retained.' };
+}
 function canonicalVariant(route) {
   const result = new Set([route]);
   if (route !== '/' && route.endsWith('/')) result.add(route.slice(0, -1));
@@ -418,18 +507,19 @@ function browserResults(bytes) {
   report.browser = { accepted: false, result: value, rawSha256: sha(bytes), rawBytes: bytes.length };
   need(value.schemaVersion === 1 && value.origin === ORIGIN && value.sourceCommit === sourceCommit
     && value.expectedDeployment === deployment && typeof value.browserVersion === 'string'
-    && Array.isArray(value.cases) && value.cases.length === 4 && value.status === 'passed'
+    && Array.isArray(value.caseIds) && JSON.stringify(value.caseIds) === '["C04"]'
+    && Array.isArray(value.cases) && value.cases.length === 1 && value.status === 'passed'
     && Array.isArray(value.errors) && value.errors.length === 0, 'browser_receipt_shape');
   const seen = new Set();
   for (const item of value.cases) {
-    need(/^C0[1-4]$/.test(item.id) && !seen.has(item.id), 'browser_case_identity'); seen.add(item.id);
+    need(item.id === 'C04' && !seen.has(item.id), 'browser_case_identity'); seen.add(item.id);
     need(item.title === TITLES[Number(item.id.slice(1)) - 1] && item.accepted === true && item.error === null
       && item.observations && typeof item.observations === 'object', 'browser_case_failure');
   }
   for (const key of ['pageErrors', 'consoleErrors', 'unexpectedRequests', 'credentialRequests', 'webSockets', 'requestFailures', 'responseErrors', 'unexpectedDialogs'])
     need(value.boundaries?.[key] === 0, 'browser_boundary');
   const c = value.cleanup;
-  need(c && c.contextsCreated === 5 && c.contextsClosed === 5 && c.browserClosed === true
+  need(c && c.contextsCreated === 2 && c.contextsClosed === 2 && c.browserClosed === true
     && c.fixtureCleanup === 'passed' && c.lateChecksComplete === true
     && Array.isArray(c.failures) && c.failures.length === 0, 'browser_resource_cleanup');
   report.browser.accepted = true;
@@ -443,7 +533,7 @@ try {
   const summary = JSON.parse(built.output[0].toString());
   need(summary.schemaVersion === 'clero.project.v1' && summary.pages === 7 && summary.htmlPages === 9
     && summary.output === published, 'publication_build_shape');
-  report.build = summary; prepareManifest();
+  report.build = summary; prepareManifest(); carryAccepted();
   report.runtime.nodeSha256 = sha(read(process.execPath, 268435456));
   const npm = fs.realpathSync(path.join(path.dirname(process.execPath), 'npm'));
   need(fs.statSync(npm).isFile(), 'npm_cli_missing'); report.runtime.npmCliSha256 = sha(read(npm, 1048576));
@@ -486,7 +576,7 @@ finally {
   if (interrupted) report.errors.push('interrupted');
   if (globalExpired || Date.now() > workEnd + 90000) report.errors.push('global_deadline');
   report.interrupted = interrupted; report.completedAtUtc = new Date().toISOString();
-  report.status = !report.errors.length && report.browser?.accepted === true && report.processCleanup.passed && report.browserProcessCleanup?.passed === true
+  report.status = !report.errors.length && report.carriedEvidence?.acceptedCases.length === 3 && report.browser?.accepted === true && report.processCleanup.passed && report.browserProcessCleanup?.passed === true
     && report.networkCleanup.passed && report.servedAssets?.length === assetManifest?.length * 2 && report.servedAssets.every(row => row.matchesExpected && row.complete)
     && report.scratchCleanup === 'passed' ? 'passed' : 'failed';
   let text = JSON.stringify(report);

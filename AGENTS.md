@@ -20,10 +20,14 @@
   checks need their explicit execution approval. Syntax, JSON, import/link and
   whitespace inspection are safe. Run Storage Guard before builds/installs.
 - Alvaro's standing approval and 5 November "Do all the work" continuation
-  authorize the four focused workspace/reader scenarios and one temporary
-  public CI job in docs/proposals/workspace-browser-checks.md, including its
+  authorize the four focused workspace/reader scenarios and bounded temporary
+  public CI execution in docs/proposals/workspace-browser-checks.md, including its
   isolated browser tooling and publication. The existing 72 domain/CLI checks
   are closed; do not repeat them without a changed input or concrete concern.
+- The first browser attempt passed C01–C03 and failed C04's search-count fixture.
+  Carry those three immutable outcomes; the completion profile runs only C04.
+  Preserve the failed receipt and keep the combined runner budget below the
+  original twenty-minute ceiling. Do not describe separate attempts as one pass.
 - Do not claim full Mintlify parity, hosted collaboration, npm publication,
   browser acceptance or production security from a build. Persist proof limits
   and source/check/deployment evidence in docs/results/.
