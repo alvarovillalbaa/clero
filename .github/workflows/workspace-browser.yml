@@ -1,0 +1,39 @@
+# Temporary scope: exact preparation and READY deployment pinned by root.
+name: Temporary Clero workspace browser checks
+on:
+  push:
+    branches: [qa/clero-workspace-20261105]
+permissions:
+  contents: read
+concurrency:
+  group: clero-workspace-20261105
+  cancel-in-progress: false
+jobs:
+  workspace:
+    if: github.event_name == 'push' && github.repository == 'alvarovillalbaa/clero' && github.event.repository.private == false && github.ref == 'refs/heads/qa/clero-workspace-20261105'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+      SOURCE_COMMIT: 07c30a1ee97194c196ae96618968f3e4fa19fc29
+      CLERO_EXPECTED_DEPLOYMENT: dpl_Ee8HJUqZ6L4jKM8QHxsrn2JhkkUu
+      CLERO_PUBLIC_REPOSITORY: ${{ github.event.repository.private == false }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ env.SOURCE_COMMIT }}
+          persist-credentials: false
+          clean: false
+          fetch-depth: 1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24.21.0
+          package-manager-cache: false
+      - name: Run only the pinned Clero workspace packet
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_COMMIT" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$CLERO_EXPECTED_DEPLOYMENT" =~ ^dpl_[A-Za-z0-9]+$ ]]
+          [[ "$(git rev-parse HEAD)" == "$SOURCE_COMMIT" ]]
+          node scripts/workspace-browser-controller.mjs --source-commit "$SOURCE_COMMIT"
