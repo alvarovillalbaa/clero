@@ -25,12 +25,20 @@
   isolated browser tooling and publication. The existing 72 domain/CLI checks
   are closed; do not repeat them without a changed input or concrete concern.
 - The first browser attempt passed C01–C03 and failed C04's search-count fixture.
-  Carry those three immutable outcomes; the completion profile runs only C04.
-  Preserve the failed receipt and keep the combined runner budget below the
-  original twenty-minute ceiling. Do not describe separate attempts as one pass.
+  The completion profile ran only C04, carrying those three immutable outcomes.
+  Preserve the failed receipt and original twenty-minute aggregate budget.
+  Do not describe separate attempts as one pass.
 - The C04 completion also failed on a response-body observer/navigation race.
-  Preserve that second receipt; repair durable browser-side observation while
-  retaining every byte assertion. No failed C04 becomes an accepted outcome.
+  Preserve that second receipt; the later durable observer retained every byte
+  assertion. No failed C04 becomes an accepted outcome.
+- The third attempt accepted C04 with durable response capture and verified
+  cleanup. Together with first-attempt C01–C03, all four identities are accepted;
+  no single four-case pass or 72-case rerun is claimed. Canonical evidence:
+  docs/results/2026/11-05/workspace-browser-checks.md and its JSON companion.
+  The confirmed-discard import invalidation/chooser reset remains a source fix,
+  not a deterministic reproduction of the pending-read race. Preserve both
+  failed receipts and the exact checked runtime/driver/controller inputs.
+  This packet is closed; do not rerun unchanged journeys.
 - Do not claim full Mintlify parity, hosted collaboration, npm publication,
   browser acceptance or production security from a build. Persist proof limits
   and source/check/deployment evidence in docs/results/.

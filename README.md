@@ -1,8 +1,9 @@
 # Clero
 
 An owned Markdown documentation publisher with a reader, an on-device workspace
-and a dependency-free Node CLI. Source is published; behavioral acceptance
-and the wider product remain unfinished. See [the brief and scope](docs/spec.md).
+and a dependency-free Node CLI. Source is published; four bounded workspace and
+reader journeys have accepted browser evidence. The wider product remains
+unfinished. See [the brief and scope](docs/spec.md).
 
 ```sh
 node bin/clero.mjs init ./my-docs
@@ -45,9 +46,15 @@ claimed safe by reputation. Input parent directory aliases resolve normally.
 Hosted team workspaces, Git sync, API tooling, richer Markdown/components, AI,
 analytics and full reference-product parity remain separate unfinished work.
 Domain/CLI and browser checks follow the supplied explicit approval rules.
-The current 72-case domain/CLI scope is approved. Its first run passed 71 cases
+The 72-case domain/CLI scope is closed. Its first run passed 71 cases
 and exposed a false-positive HTML-attribute assertion; the correction retains
 the same case names and adds real executable-attribute controls. See the
 [execution receipt](docs/results/2026/10-31/static-publication-checks.md).
-The initial 48-check proposal remains tied to its original source. Browser
-acceptance remains separate and unverified.
+The initial 48-check proposal remains tied to its original source. The separate
+[browser receipt](docs/results/2026/11-05/workspace-browser-checks.md) accepts
+C01–C03 from the first attempt and C04 from the third; both failures are retained,
+and no single four-case pass or rerun of the 72 checks is claimed. It covers
+real import/edit/save/download roundtrips, invalid-input preservation, two-tab
+conflicts and narrow reader/search/clipboard behavior, including static reading
+without JavaScript. The confirmed-discard import invalidation/chooser reset is
+source-repaired; its pending-read race was not deterministically reproduced.

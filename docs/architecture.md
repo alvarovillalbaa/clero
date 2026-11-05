@@ -31,6 +31,10 @@ the original Markdown in portable JSON. Saving a draft is explicit and scoped
 to Clero's own browser storage key. Acknowledgement requires a matching
 readback; quota/availability failures do not become successful-save messages.
 There is no upload, account, hosted collaboration or backend persistence.
+Confirmed discard invalidates an earlier import sequence and clears the file
+chooser, so a late read cannot reactivate the discarded selection. Browser
+coverage exercises ordinary discard/reimport; it does not deterministically
+reproduce the pending-read race.
 
 ## CLI and output
 
@@ -61,10 +65,19 @@ the CLI on it to create `public/`; it installs no packages. That necessary hoste
 build is separate from authored domain/filesystem cases. The initial 48-check
 scope remains pinned to its original source. Static publication adds separately
 proposed routing/publication cases and adapts the model boundary and CLI output assertions.
-The 72-case domain/CLI scope is now approved; its first run passed 71 cases and
+The 72-case domain/CLI scope is closed; its first run passed 71 cases and
 exposed a false-positive assertion that is corrected without changing product
 HTML. [Execution evidence](results/2026/10-31/static-publication-checks.md) records
-the exact tested sources. Browser acceptance remains separately unverified.
+the exact tested sources. The separate
+[browser receipt](results/2026/11-05/workspace-browser-checks.md) accepts four
+workspace/reader identities across three attempts: C01–C03 from the first and
+C04 from the third. The first search-count fixture failure and second
+response-observer failure remain recorded; neither is relabeled a pass. The
+final C04 observer uses an owned durable Chromium CDP session to retain exact
+project-response bytes across native legacy navigation, including the transient
+root document. Native clipboard readback, narrow layout, JavaScript-disabled
+reading and owned teardown passed within that profile. The 72 checks were not
+repeated. No single four-case browser invocation passed.
 
 ## Boundaries
 

@@ -1,9 +1,11 @@
 # Workspace and published-reader browser checks
 
-**Current status — 5 November 2026: partial; C04 remains unaccepted.**
-C01–C03 passed in the first run; both C04 attempts failed. The
-[failure/completion record](#second-failure-and-durable-observer-repair) below
-supersedes the original execution plan without claiming one four-case pass.
+**Current status — 5 November 2026: all four identities accepted across three attempts.**
+C01–C03 retain first-attempt evidence; only the third attempt accepts C04.
+Both failed attempts remain immutable. See the
+[canonical receipt](../results/2026/11-05/workspace-browser-checks.md) and
+[accepted-result qualification](#accepted-result-and-final-status-edition).
+No single four-case pass or rerun of the 72 checks is claimed.
 
 **Original preparation (then unrun) — 5 November 2026.** This proposal and its
 [inactive workflow example](workspace-browser.workflow.yml.example) are source
@@ -106,10 +108,12 @@ cleanup 90 s and final stdout 2 s. Inside that work window, tooling install 150 
 Chromium install 240 s, the one CLI build 60 s and driver 300 s have bounded children;
 their sums do not create independent extensions of the outer deadline.
 
-Acceptance requires exactly C01–C04 once, all passed, actual child exit 0, no
+The original full profile requires exactly C01–C04 once, all passed, actual child exit 0, no
 unexpected/global error, matching source/public-byte checks and verified current
-owned cleanup. No retry, skipped case, partial report or trimmed diagnostic can
-become a pass. Preserve bounded complete compressed raw streams, actual
+owned cleanup. The completion profile instead executes only C04 and validates
+immutable accepted C01–C03 evidence; it does not fabricate current rows for them.
+No skipped case, partial report or trimmed diagnostic can become a pass.
+Preserve bounded complete compressed raw streams, actual
 observations, hashes and cleanup independently of summary status. Failures are
 retained before any repair; a later edition does not erase their limits.
 
@@ -142,7 +146,7 @@ carrying the first three with immutable source/result checks. Current full
 pre/post assets and cleanup remain required. Its 18-minute job plus the first
 50 seconds totals at most 1130 seconds, below the original 1200-second ceiling:
 900-second work, 90-second cleanup, unchanged install bounds, driver 240/45/2
-inside outer 300. No accepted four-case outcome exists yet.
+inside outer 300. No accepted combined outcome existed at this stage.
 
 ## Second failure and durable-observer repair
 
@@ -159,11 +163,41 @@ asset check is claimed.
 The repair prepares an owned Chromium CDP session before navigation, with
 bounded durable response-body buffers. The primary [Network protocol](https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/pdl/domains/Network.pdl)
 and [Playwright CDP API](https://playwright.dev/docs/api/class-browsercontext#browser-context-new-cdp-session)
-describe that mechanism; actual compatibility remains to be observed. All body
+describe that mechanism; actual compatibility was unverified before the third
+attempt below. All body
 SHA comparisons, including transient legacy responses, remain required. No
 mock, navigation timing gate or ignored observer error is introduced.
 
-Only C04 will execute; C01–C03 retain first-run evidence. Both failed receipts
+Only C04 was scheduled; C01–C03 retain first-run evidence. Both failed receipts
 remain immutable. The 94 seconds used plus another 18-minute ceiling totals
 1174 seconds, below the original 1200; work 900 s, cleanup 90 s and driver/install
-bounds remain unchanged. No accepted combined outcome exists yet.
+bounds remain unchanged. No accepted combined outcome existed at this stage.
+
+## Accepted result and final status edition
+
+[Run 42035490419](https://github.com/alvarovillalbaa/clero/actions/runs/42035490419),
+job `127272425888`, accepted C04 on checked source
+`55f802dba149b53220bb59e2f422f94170ee65ad`, bound to READY deployment
+`dpl_DnBAzsz2gxUG69R2ALeQyEwvdGM7`. It ran **13:24:36–13:25:15 UTC**,
+39 seconds. The three actual job durations were 50, 44 and 39 seconds, totaling
+133 seconds within the approved aggregate ceiling.
+
+The third attempt retained exact three-result search order/native Enter,
+legacy/heading navigation, native clipboard readback, 390×844 layout and
+JavaScript-disabled reading. Its one durable CDP session captured all five
+complete project bodies, including the transient legacy root response, and
+detached. Both contexts, owned browser processes and scratch closed cleanly;
+all 35 child commands, five full source guards and 52 before/after public
+response observations passed. The 25 application payloads are identical across
+all three sources. These facts support C01–C03 carry from attempt one; attempt
+two contributes no accepted C04 evidence.
+
+The [machine-readable receipt](../results/2026/11-05/workspace-browser-checks.json)
+and [human-readable receipt](../results/2026/11-05/workspace-browser-checks.md)
+preserve both failures and the bounded proof limits. The three-line
+confirmed-discard invalidation/chooser reset is source-supported; ordinary
+discard/reimport acceptance does not prove the pending-read race was reproduced.
+This final status edition changes only `AGENTS.md`, `README.md`,
+`docs/architecture.md` and this proposal relative to the 51 checked source
+inputs; the other 47 remain unchanged. Results and workflow retirement are
+recorded separately, without claiming a new execution of the final doc edition.
